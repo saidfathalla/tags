@@ -9,6 +9,7 @@ import math
 import io
 import base64
 import argparse
+import sys # Added missing import
 from collections import defaultdict
 
 # 1. Secure Dependency Imports
@@ -287,12 +288,21 @@ def generate_html_dashboard(results, base_name, output_dir, p1_b64, p2_b64, void
 def main():
     parser = argparse.ArgumentParser(description="FAIR Knowledge Graph Analytics Profiler Pipeline Engine.")
     parser.add_argument("ttl_file", help="Path to targeted RDF Turtle file.")
-    parser.add_argument("-o", "--output-dir", default=".", help="Target output directory folder path.")
+    parser.add_argument("-o", "--output-dir", default="./output", help="Target output directory folder path.")
     args = parser.parse_args()
     
     if not os.path.exists(args.ttl_file):
         print(f"Error: Target graph path '{args.ttl_file}' does not exist.")
         return
+
+    # Create output directory if it doesn't exist
+    if not os.path.exists(args.output_dir):
+        try:
+            os.makedirs(args.output_dir)
+            print(f"[System] Created output directory: {args.output_dir}")
+        except Exception as e:
+            print(f"[Error] Could not create output directory {args.output_dir}: {e}")
+            return
 
     base_name = os.path.splitext(os.path.basename(args.ttl_file))[0]
     
