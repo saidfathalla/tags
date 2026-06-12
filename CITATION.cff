@@ -1,17 +1,20 @@
 cff-version: 1.2.0
-message: "If you use this software, please cite it as below."
+message: "If you use this software or incorporate its topological metrics engine, please cite it as below."
 authors:
-  - family-names: "Said"
-    given-names: "Fathalla"
-     orcid: "https://orcid.org/0000-0002-2818-5890"
-title: "TAGS: A Two-Pass Topological Profiling Framework for Scholarly Knowledge Graphs"
-version: 1.0.0
-date-released: 2026-05-20
-url: "https://github.com/saidfathalla/tags"
-license: MIT
+  - family-names: "Fathalla"
+    given-names: "Said"
+    orcid: "https://orcid.org/0000-0002-2818-5890"
+title: "TAGS: Topological Analysis of Graph Structure"
+version: "1.0.0"
+date-released: "2026-06-12"
+url: "https://github.com/saidfathalla/TAGS"
+repository-code: "https://github.com/saidfathalla/TAGS"
 keywords:
-  - Knowledge Graph
-  - Semantic Web
-  - FAIR Data
-  - Topological Analysis
-  - RDF
+  - "Scientometrics"
+  - "Knowledge Graphs"
+  - "Scholarly Data"
+  - "Topological Metrics"
+  - "Ontology Engineering"
+  - "Semantic Web"
+  - "FAIR Digital Objects"
+license: "MIT"
