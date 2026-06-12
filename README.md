@@ -57,9 +57,6 @@ Upon execution, TAGS generates three distinct outputs:
 
 This project utilizes `pytest` to ensure structural analysis metrics remain consistent across updates. We maintain a CI/CD pipeline using GitHub Actions to automatically validate code integrity on every push.
 
-### Build Status
-[![Build Status](https://github.com/YOUR_USERNAME/TAGS/actions/workflows/pytest.yml/badge.svg)](https://github.com/YOUR_USERNAME/TAGS/actions)
-
 ### Running Tests Locally
 We recommend running tests before submitting changes to ensure local logic parity. Ensure you have installed the development dependencies:
 
@@ -67,7 +64,9 @@ We recommend running tests before submitting changes to ensure local logic parit
 pip install -r requirements.txt
 python3 -m pytest
 ```
-The test suite validates the core analyze_knowledge_graph logic against a synthetic graph to ensure parsing accuracy and metric computation stability.
+The test suite validates the core analyze_knowledge_graph logic against a synthetic graph to ensure parsing accuracy and stability of metric computation. The following figure shows the results of the baseline test graph.
+<img width="1104" height="710" alt="image" src="https://github.com/user-attachments/assets/7a99bce7-67cd-4a56-8ce2-5256c436f642" />
+
 
    
 ### Citation
