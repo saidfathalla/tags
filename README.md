@@ -79,7 +79,8 @@ pip install pytest
 python3 -m pytest
 ```
 The test suite validates the core `analyze_knowledge_graph` logic against a synthetic graph to ensure parsing accuracy and stability of metric computation. The following figure shows the results of the baseline test graph.
-<img width="1104" height="710" alt="image" src="https://github.com/user-attachments/assets/7a99bce7-67cd-4a56-8ce2-5256c436f642" />
+
+<img width="1004" height="610" alt="Test Results Baseline" src="examples/test_baseline_results_table.png" />
 
 ### Running Tests Locally
 We recommend running tests before submitting changes to ensure local logic parity. Ensure you have installed the development dependencies:
