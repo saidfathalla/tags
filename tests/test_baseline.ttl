@@ -1,0 +1,26 @@
+@prefix : <https://schema.org/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+# =================================================================
+# LAYER 1: TAXONOMIC TYPE ASSERTIONS (|T_type| = 7)
+# =================================================================
+:Node_A rdf:type :Researcher .
+:Node_B rdf:type :Researcher .
+:Node_C rdf:type :Project .
+:Node_D rdf:type :Project .
+:Node_E rdf:type :Dataset .
+:Node_F rdf:type :Dataset .
+:O_1    rdf:type :OrphanClass .  # The isolated type-only orphan node
+
+# =================================================================
+# LAYER 2: STRUCTURAL OBJECT LINKS (|E| = 7)
+# =================================================================
+# Component 1 (Main connected network: Nodes A, B, C, D, E, F)
+:Node_A :collaboratesWith :Node_B .
+:Node_A :leadsProject     :Node_C .
+:Node_B :memberOfProject  :Node_C .
+:Node_B :producesData     :Node_E .
+:Node_C :hasOutput        :Node_D .
+:Node_D :utilizesDataset  :Node_F .
+:Node_E :references       :Node_F .

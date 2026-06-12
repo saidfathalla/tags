@@ -1,0 +1,21 @@
+@prefix dcterms1: <https://schema.org/dcterms#> .
+@prefix schema: <https://schema.org/> .
+@prefix void1: <https://schema.org/void#> .
+@prefix xsd1: <https://schema.org/xsd#> .
+
+<http://purls.helmholtz-metadaten.de/helmholtzkg/test_baseline> a void1:Dataset ;
+    dcterms1:title "Topological Profile for test_baseline"@en ;
+    void1:classPartition [ void1:class_ schema:OrphanClass ;
+            void1:entities "1"^^xsd1:integer ],
+        [ void1:class_ schema:Dataset ;
+            void1:entities "2"^^xsd1:integer ],
+        [ void1:class_ schema:Researcher ;
+            void1:entities "2"^^xsd1:integer ],
+        [ void1:class_ schema:Project ;
+            void1:entities "2"^^xsd1:integer ] ;
+    void1:classes "4"^^xsd1:integer ;
+    void1:distinctObjects "9"^^xsd1:integer ;
+    void1:distinctSubjects "7"^^xsd1:integer ;
+    void1:properties "8"^^xsd1:integer ;
+    void1:triples "14"^^xsd1:integer .
+
