@@ -74,7 +74,7 @@ Upon compilation, the TAGS engine writes three unified output layers to your cho
 
 This project utilizes `pytest` to ensure structural analysis metrics remain consistent across updates. We maintain a CI/CD pipeline using GitHub Actions to validate code integrity on every push automatically.
 
-``bash
+```bash
 pip install pytest
 python3 -m pytest
 ```
