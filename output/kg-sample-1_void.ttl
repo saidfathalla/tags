@@ -1,0 +1,14 @@
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix void: <http://rdfs.org/ns/void#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://purls.helmholtz-metadaten.de/helmholtzkg/kg-sample-1> a void:Dataset ;
+    dcterms:title "Topological Profile for kg-sample-1"@en ;
+    void:classPartition [ void:class_ void:Dataset ;
+            void:entities 1 ] ;
+    void:classes 1 ;
+    void:distinctObjects 19 ;
+    void:distinctSubjects 5 ;
+    void:properties 10 ;
+    void:triples 19 .
+

@@ -9,3 +9,6 @@ venv/
 
 # OS metadata
 .DS_Store
+
+# Ignore all programmatic pipeline outputs
+output/
