@@ -9,3 +9,9 @@ version: 1.0.0
 date-released: 2026-05-20
 url: "https://github.com/saidfathalla/tags"
 license: MIT
+keywords:
+  - Knowledge Graph
+  - Semantic Web
+  - FAIR Data
+  - Topological Analysis
+  - RDF

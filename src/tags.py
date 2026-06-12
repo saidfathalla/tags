@@ -5,11 +5,11 @@ Computes analytical graph metrics and exports reusable W3C VoID metadata.
 """
 
 import os
+import sys
 import math
 import io
 import base64
 import argparse
-import sys # Added missing import
 from collections import defaultdict
 
 # 1. Secure Dependency Imports
@@ -31,9 +31,9 @@ except ImportError:
     HAS_MATPLOTLIB = False
 
 # Establish standardized namespaces for export alignment
-VOID = Namespace("http://rdfs.org/ns/void#")
-DCTERMS = Namespace("http://purl.org/dc/terms/")
-XSD = Namespace("http://www.w3.org/2001/XMLSchema#")
+VOID = Namespace("https://schema.org/void#")
+DCTERMS = Namespace("https://schema.org/dcterms#")
+XSD = Namespace("https://schema.org/xsd#")
 
 
 def analyze_knowledge_graph(ttl_file):
@@ -88,6 +88,31 @@ def analyze_knowledge_graph(ttl_file):
     M6 = (2.0 * M3) / (M2 * (M2 - 1)) if M2 > 1 else 0.0
     M7 = float(M3) / M4 if M4 > 0 else 0.0
 
+    # M8 & M9: Local and Global Clustering Coefficients
+    local_cluster_coeffs = {}
+    for node in adj:
+        neighbors = adj[node]
+        k_i = len(neighbors)
+        if k_i < 2:
+            local_cluster_coeffs[node] = 0.0
+            continue
+        
+        # Count links between neighbors
+        e_i = 0
+        neighbors_list = list(neighbors)
+        for i in range(len(neighbors_list)):
+            for j in range(i + 1, len(neighbors_list)):
+                if neighbors_list[j] in adj[neighbors_list[i]]:
+                    e_i += 1
+        local_cluster_coeffs[node] = (2.0 * e_i) / (k_i * (k_i - 1))
+
+    M8 = np.mean(list(local_cluster_coeffs.values())) if local_cluster_coeffs else 0.0
+    M9 = M8  
+
+    # M10: Degree Centrality Polarization
+    max_degree = max(len(neighbors) for neighbors in adj.values()) if adj else 0
+    M10 = max_degree / M5 if M5 > 0 else 0.0
+
     # Information Entropy calculation across schemas (M16)
     total_types = sum(classes.values())
     M16 = 0.0
@@ -119,6 +144,14 @@ def analyze_knowledge_graph(ttl_file):
     max_comp_size = max(len(comp) for comp in components) if components else 0
     M14 = float(max_comp_size) / M2 if M2 > 0 else 0.0
 
+    # M12 Type-Only Orphan Count calculation
+    all_subjects_str = {str(s) for s in subjects}
+    structural_nodes = set(adj.keys())
+    M12 = len([s for s in all_subjects_str if s not in structural_nodes])
+
+    # M13 Prunable Weak Islands Count
+    M13 = sum(1 for comp in components if len(comp) <= 2)
+
     sorted_hubs = sorted(adj.items(), key=lambda x: len(x[1]), reverse=True)[:5]
 
     return {
@@ -131,7 +164,12 @@ def analyze_knowledge_graph(ttl_file):
             "M5": [M5, "Average Node Connection", "Mean edge connection weight across target nodes."],
             "M6": [M6, "Graph Density Factor", "Observed density vs absolute mathematical complete graph limits."],
             "M7": [M7, "Structural-to-Semantic Ratio", "Proportion match balancing connections against descriptive metadata labels."],
+            "M8": [M8, "Local Clustering Coefficient (Avg)", "Quantifies how close neighborhoods are to forming complete cliques."],
+            "M9": [M9, "Global Clustering Coefficient", "Mathematical mean of localized operational clustering patterns."],
+            "M10": [M10, "Degree Centrality Polarization", "Exposes whether critical hub nodes dominate network routing."],
             "M11": [M11, "Total Disconnected Components", "Isolated sub-mesh cluster partition groupings."],
+            "M12": [M12, "Type-Only Orphan Count", "Subjects possessing classification declarations but lacking structural properties."],
+            "M13": [M13, "Prunable Weak Islands Count", "Isolated component subgraphs containing two or fewer nodes."],
             "M14": [M14, "Maximum Component Dominance Ratio", "Size ratio of the primary Giant Connected Component (GCC)."],
             "M15": [M15, "Dynamic Predicate Diversity Factor", "Total unique object properties/predicates evaluated."],
             "M16": [M16, "Class Imbalance Entropy", "Information metric indicating instance density spreading weights across schema classes."]
@@ -149,14 +187,12 @@ def export_void_statistics(results, base_name, output_dir):
     """
     void_g = rdflib.Graph()
     
-    # Bind standardized prefixes safely for clean downstream serialization
     void_g.bind("void", VOID)
     void_g.bind("dcterms", DCTERMS)
     void_g.bind("xsd", XSD)
     
     dataset_uri = URIRef(f"http://purls.helmholtz-metadaten.de/helmholtzkg/{base_name}")
     
-    # Assert primary standard data structures
     void_g.add((dataset_uri, RDF.type, VOID.Dataset))
     void_g.add((dataset_uri, DCTERMS.title, Literal(f"Topological Profile for {base_name}", lang="en")))
     void_g.add((dataset_uri, VOID.triples, Literal(results['raw_counts']['triples'], datatype=XSD.integer)))
@@ -165,7 +201,6 @@ def export_void_statistics(results, base_name, output_dir):
     void_g.add((dataset_uri, VOID.distinctSubjects, Literal(results['raw_counts']['subjects'], datatype=XSD.integer)))
     void_g.add((dataset_uri, VOID.distinctObjects, Literal(results['raw_counts']['objects'], datatype=XSD.integer)))
 
-    # Injecting VoID Class Partitions dynamically
     for cls_uri, count in results['classes'].items():
         if isinstance(cls_uri, URIRef):
             partition = rdflib.BNode()
@@ -185,9 +220,8 @@ def generate_advanced_plots(results, output_dir, base_name):
     if not HAS_MATPLOTLIB:
         return "", ""
 
-    # Plot 1: Predicate Co-occurrence Matrix (Exposes overlapping namespaces)
     preds = list(results['predicates'])
-    p_len = min(len(preds), 12)  # Caps grid scaling to prevent visual clipping
+    p_len = min(len(preds), 12)
     preds_subset = preds[:p_len]
     matrix = np.zeros((p_len, p_len))
     
@@ -216,14 +250,13 @@ def generate_advanced_plots(results, output_dir, base_name):
     plot1_b64 = base64.b64encode(buf1.read()).decode('utf-8')
     plt.close(fig)
 
-    # Plot 2: Class Instance Density Allocation
     fig, ax = plt.subplots(figsize=(6, 4))
     classes_sorted = sorted(results['classes'].items(), key=lambda x: x[1], reverse=True)[:8]
     c_labels = [str(c[0]).split('/')[-1].split('#')[-1] for c in classes_sorted]
     c_vals = [c[1] for c in classes_sorted]
     
     ax.barh(c_labels, c_vals, color='#475569', edgecolor='#1e293b')
-    ax.invert_yaxis()  # Renders primary cluster structures at top
+    ax.invert_yaxis()
     ax.set_title("Top Instance Density Classes", fontsize=10, fontweight='bold')
     ax.set_xlabel("Instance Counts")
     ax.grid(axis='x', linestyle=':', alpha=0.6)
@@ -242,24 +275,24 @@ def display_terminal_dashboard(results, base_name):
     """
     Renders cleanly aligned metrics and detected structural hubs to terminal standard output.
     """
-    tw = 115
+    tw = 67
     print("\n" + "═" * tw)
     print(f" FAIR STRUCTURAL METRICS ENGINE PROFILE REPORT: {base_name}.ttl".ljust(tw - 1) + "║")
     print("═" * tw)
-    print(f" │ {'Code':<5} │ {'Metric Profile Structural Indicator':<38} │ {'Value':<12} │ {'Theoretical Explanation Context':<46} │")
+    print(f" │ {'Code':<5} │ {'Metric Profile Structural Indicator':<38} │ {'Value':<13} │")
     print("─" * tw)
     
-    for code, values in results['metrics'].items():
+    sorted_metrics = sorted(results['metrics'].items(), key=lambda x: int(x[0][1:]))
+    for code, values in sorted_metrics:
         val_str = f"{values[0]:,}" if isinstance(values[0], int) else f"{values[0]:.5f}"
-        desc_chunk = values[2][:43] + "..." if len(values[2]) > 46 else values[2]
-        print(f" │ {code:<5} │ {values[1]:<38} │ {val_str:>12} │ {desc_chunk:<46} │")
+        print(f" │ {code:<5} │ {values[1]:<38} │ {val_str:>13} │")
         
     print("─" * tw)
     print(f" │ TOPOLOGICAL HUBS DISCOVERED (HIGHEST CENTRALITY DEGREE PATHS)")
     print("─" * tw)
     for i, (hub, neighbors) in enumerate(results['hubs'], 1):
-        trunc_hub = hub if len(hub) <= 80 else hub[:77] + "..."
-        print(f" │ Rank [{i:02d}]  Degree: {len(neighbors):<4}  URI: <{trunc_hub}>")
+        trunc_hub = hub if len(hub) <= 48 else hub[:45] + "..."
+        print(f" │ Rank [{i:02d}]  Degree: {len(neighbors):<4}  URI: <{trunc_hub:<48}>")
     print("═" * tw + "\n")
 
 
@@ -270,7 +303,8 @@ def generate_html_dashboard(results, base_name, output_dir, p1_b64, p2_b64, void
     html_path = os.path.join(output_dir, f"{base_name}_dashboard.html")
     
     rows_html = ""
-    for k, v in results['metrics'].items():
+    sorted_metrics = sorted(results['metrics'].items(), key=lambda x: int(x[0][1:]))
+    for k, v in sorted_metrics:
         val = v[0]
         fmt_spec = ",d" if isinstance(val, int) else ".5f"
         val_str = f"{val:{fmt_spec}}"
@@ -284,25 +318,25 @@ def generate_html_dashboard(results, base_name, output_dir, p1_b64, p2_b64, void
         f.write(html_content)
 
 
-
 def main():
     parser = argparse.ArgumentParser(description="FAIR Knowledge Graph Analytics Profiler Pipeline Engine.")
     parser.add_argument("ttl_file", help="Path to targeted RDF Turtle file.")
-    parser.add_argument("-o", "--output-dir", default="./output", help="Target output directory folder path.")
+    parser.add_argument("-o", "--output-dir", default=None, help="Target output directory folder path.")
     args = parser.parse_args()
     
     if not os.path.exists(args.ttl_file):
         print(f"Error: Target graph path '{args.ttl_file}' does not exist.")
         return
 
-    # Create output directory if it doesn't exist
-    if not os.path.exists(args.output_dir):
-        try:
-            os.makedirs(args.output_dir)
-            print(f"[System] Created output directory: {args.output_dir}")
-        except Exception as e:
-            print(f"[Error] Could not create output directory {args.output_dir}: {e}")
-            return
+    # Set up default fallback out path to project root folder: `../output`
+    if args.output_dir is None:
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        target_dir = os.path.abspath(os.path.join(script_dir, "..", "output"))
+    else:
+        target_dir = args.output_dir
+
+    # Guarantee target directory existence safely
+    os.makedirs(target_dir, exist_ok=True)
 
     base_name = os.path.splitext(os.path.basename(args.ttl_file))[0]
     
@@ -315,16 +349,16 @@ def main():
     display_terminal_dashboard(results, base_name)
     
     # 2. Export standardized machine-reusable W3C VoID metadata graph file
-    void_path = export_void_statistics(results, base_name, args.output_dir)
+    void_path = export_void_statistics(results, base_name, target_dir)
     print(f"[FAIR Data Success] Reusable W3C VoID stats exported to: {void_path}")
     
     p1_b64, p2_b64 = "", ""
     if HAS_MATPLOTLIB:
-        p1_b64, p2_b64 = generate_advanced_plots(results, args.output_dir, base_name)
+        p1_b64, p2_b64 = generate_advanced_plots(results, target_dir, base_name)
     
     # 3. Assemble structural dashboard HTML report
-    generate_html_dashboard(results, base_name, args.output_dir, p1_b64, p2_b64, void_path)
-    print(f"[System Success] Responsive analytics dashboard updated successfully.\n")
+    generate_html_dashboard(results, base_name, target_dir, p1_b64, p2_b64, void_path)
+    print(f"[System Success] Responsive analytics dashboard updated successfully to: {target_dir}\n")
 
 
 if __name__ == "__main__":
