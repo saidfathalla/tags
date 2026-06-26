@@ -1,0 +1,24 @@
+@prefix rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix schema:   <https://schema.org/> .
+@prefix hkg:      <http://purls.helmholtz-metadaten.de/helmholtzkg/> .
+@prefix doi:      <https://doi.org/10.5061/dryad.> .
+@prefix orcid:    <https://orcid.org/> .
+@prefix ror:      <https://ror.org/> .
+@prefix rox:      <https://rorx.org/> .
+
+
+hkg:hkg:215f331213f003ca39197c42d6558fbf5ddaa8331d343ccde795cc3fdad66b44 a schema:Person .
+
+doi:hdr7sqvk8 schema:author orcid:0000-0002-1390-2359 .
+
+hkg:hkg:24deacf83ba36289c3f87f0e97b940489cc20b9b5f0f9f580ac2a88c5eb7d8a7 a schema:Person .
+
+orcid:0000-0002-1390-2359 a schema:Person .
+
+doi:hdr7sqvk8 a schema:Dataset ;
+    schema:author hkg:hkg:215f331213f003ca39197c42d6558fbf5ddaa8331d343ccde795cc3fdad66b44 ,
+                  hkg:hkg:24deacf83ba36289c3f87f0e97b940489cc20b9b5f0f9f580ac2a88c5eb7d8a7 ;
+    schema:publisher ror:00x6h5n95 .
+
+ror:00x6h5n95 a schema:Organization ;
+schema:name "FZJ".
