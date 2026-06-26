@@ -6,9 +6,9 @@
 
 # TAGS: Topological Analysis of Graph Structure
 
-**TAGS** (Topological Analysis of Graph Structure), an extended multi-pass graph profiling framework containing sixteen topological and semantic metrics designed specifically to decouple classification vocabularies from instance graph topologies. 
+TAGS is a two-pass graph profiling framework that integrates **16 topological and semantic metrics** (combining standard network-science quantities with specialized RDF) to measure structural graph quality by isolating instance-level topologies from taxonomic metadata. 
 
-Unlike standard network profilers that treat all RDF triples as structural edges—leading to "semantic inflation"— TAGS isolates pure relational instance data to calculate meaningful topological metrics for quality assurance, index tuning, and database optimization.
+Unlike standard network profilers that treat all RDF triples as structural edges—leading to "semantic inflation", TAGS isolates pure relational instance data to calculate meaningful topological metrics for quality assurance, index tuning, and database optimization.
 
 ## Key Features
 
