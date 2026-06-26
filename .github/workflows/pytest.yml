@@ -22,4 +22,4 @@ jobs:
       - name: Run pytest
         run: |
           export PYTHONPATH=$PYTHONPATH:$(pwd):$(pwd)/src
-          python3 -m pytest
+          python3 -m pytest --ignore=src/run_scale_test.py
