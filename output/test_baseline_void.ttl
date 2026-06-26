@@ -9,9 +9,9 @@
             void1:entities "1"^^xsd1:integer ],
         [ void1:class_ schema:Dataset ;
             void1:entities "2"^^xsd1:integer ],
-        [ void1:class_ schema:Researcher ;
-            void1:entities "2"^^xsd1:integer ],
         [ void1:class_ schema:Project ;
+            void1:entities "2"^^xsd1:integer ],
+        [ void1:class_ schema:Researcher ;
             void1:entities "2"^^xsd1:integer ] ;
     void1:classes "4"^^xsd1:integer ;
     void1:distinctObjects "9"^^xsd1:integer ;
