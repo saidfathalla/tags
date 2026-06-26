@@ -12,12 +12,15 @@ Unlike standard network profilers that treat all RDF triples as structural edges
 
 ## Key Features
 
-* **Multi-Pass Decoupling Architecture:** Isolates abstract taxonomic classifications (e.g., `rdf:type` or provenance assertions) from the underlying instance-level adjacency map. This filters structural noise and protects the mathematical validity of downstream network macro-properties against taxonomic inflation.
-* **16 Topological Graph Diagnostics:** Computes a comprehensive suite of structural metrics—spanning sparsity profiles, connectivity transitivity, and fragmentation analysis—serving as a quantitative, machine-actionable instrumentation layer for dataset validation.
-* **FAIR Data & Provenance Generation:** Automatically generates and serializes machine-reusable metadata profiles compliant with W3C VoID standards, embedding structural graph characteristics directly into the data lifecycle to maximize downstream discoverability and reproducibility.
-* **Systems & Storage Optimization Engine:** Translates topological indicators (such as Degree Centrality Polarization and Class Imbalance Entropy) into actionable performance tuning primitives for physical triplestore caching, cost-based SPARQL query planning, and join-ordering acceleration.
-* **Empirical Scientometric Utility:** Recovers genuine scientific relationships, collaboration networks, and dataset cross-linkages in large-scale scholarly knowledge graphs (SKGs), ensuring that empirical indicators computed for research evaluation remain statistically robust and free from ingestion artifacts.
+## Features
 
+* **Two-Pass Algorithmic Decoupling**: isolates ontological schema layers from raw instance connections, ensuring completely accurate graph metrics without metadata path distortion.
+* **High-Performance Processing**:  optimized in-memory data structures and localized neighborhood traversals, entirely eliminating heavy, external graph framework overhead.
+* **Comprehensive Metric Taxonomy**: calculates 16 core structural parameters ($M_1 \text{--} M_{16}$), tracking local sub-clique densities, centralities, and component topologies.
+* **Semantic Quality Diagnostics**: measures abstract network health properties, such as Class Imbalance Shannon Entropy and Type-Only Orphan Node counts.
+* **Triplestore Optimization Insights**: computes actionable topological indicators—like Degree Centrality Polarization—to drive database query planning, index selection, and subgraph caching strategies.
+* **VoID Metadata Export**: serializes analytical profiles into standardized W3C VoID metadata for instant machine discovery.
+* **Production-Ready CI/CD Validation**: features an integrated test suite checking against a mathematically derived ground-truth baseline.
 
 ## Installation
 
@@ -44,12 +47,12 @@ TAGS is designed as a command-line tool. Run the profiler by pointing it to your
 - **Default output:** By default, the pipeline automatically resolves an absolute path relative to the script location and safely routes all outputs directly to `../output/`:
 
    ```bash
-	python3 tags.py ./examples/kg-sample-1.ttl 
+	python3 tags.py ./examples/hkg_sample_triples_9.ttl 
    ```
 - **Custom Output:** To explicitly direct all generated payloads, visualizations, and summary files into a targeted storage destination, use the `-o` or `--output-dir` parameter:
 
    ```bash
-  python3 tags.py path/to/your_dataset.ttl -o /path/to/custom_output/
+  python3 tags.py ./examples/hkg_sample_triples_9.ttl  -o /path/to/custom_output/
    ```
  - **Help Configuration Options:** To view the command-line interface helper configurations and flags, run:
   
@@ -96,7 +99,7 @@ The test suite validates the core analyze_knowledge_graph logic against a synthe
 To demonstrate the computational viability and structural diagnostic utility of TAGS on production-scale data, the engine was stress-tested against a dense, highly centralized real-world knowledge graph asset centered on the city of Berlin harvested from DBpedia ([DBpedia-mini-samples-Berlin.ttl](http://dbpedia.org/data/Berlin.ttl)).
 
 ```bash
-python3 run_scale_test.py ../examples/Large-scale-data/DBpedia-mini-samples-Berlin.ttl
+python3 src/run_scale_test.py ../examples/Large-scale-data/DBpedia-mini-samples-Berlin.ttl
 ```
 The framework successfully executed the entire 16-metric extraction matrix on standard commodity hardware with the following resource profiles:
 
