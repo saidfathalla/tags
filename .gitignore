@@ -13,3 +13,4 @@ venv/
 # Ignore all programmatic pipeline outputs
 output/
 examples/Large-scale-data/
+env/
