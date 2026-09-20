@@ -1,0 +1,8 @@
+@prefix : <https://schema.org/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+:Node_A rdf:type :Person ;
+        :name "Alice" ;
+        :age 30 ;
+        :score "98.5"^^xsd:float .

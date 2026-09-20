@@ -1,0 +1,5 @@
+@prefix : <https://schema.org/> .
+
+:Node_A :knows :Node_B .
+:Node_B :leadsProject :Node_C .
+:Node_C :usesDataset :Node_A .

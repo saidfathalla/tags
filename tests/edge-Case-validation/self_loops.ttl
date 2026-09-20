@@ -1,0 +1,8 @@
+@prefix : <https://schema.org/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+:Node_A rdf:type :Process .
+:Node_B rdf:type :Process .
+
+:Node_A :dependsOn :Node_A . # Self-loop
+:Node_A :connectsTo :Node_B .

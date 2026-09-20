@@ -1,0 +1,8 @@
+@prefix : <https://schema.org/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+:Node_A rdf:type :Researcher ;
+        rdf:type :SoftwareEngineer ;
+        rdf:type :ProjectLead .
+
+:Node_B rdf:type :Researcher .

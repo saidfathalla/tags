@@ -1,0 +1,13 @@
+@prefix : <https://schema.org/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+# Connected component (Size 2)
+:Node_A rdf:type :Person .
+:Node_B rdf:type :Person .
+:Node_A :knows :Node_B .
+
+# Disconnected singleton orphan 1 (Type-only)
+:Orphan_1 rdf:type :Dataset .
+
+# Disconnected singleton orphan 2 (Type-only)
+:Orphan_2 rdf:type :Project .

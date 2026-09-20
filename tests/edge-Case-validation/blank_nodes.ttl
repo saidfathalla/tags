@@ -1,0 +1,11 @@
+@prefix : <https://schema.org/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+:Node_A rdf:type :Person ;
+        :hasAddress [
+            rdf:type :PostalAddress ;
+            :city "Bonn"
+        ] .
+
+_:b1 rdf:type :Dataset ;
+     :referencedBy :Node_A .
