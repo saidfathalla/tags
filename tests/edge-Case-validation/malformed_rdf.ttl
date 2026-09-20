@@ -1,0 +1,6 @@
+@prefix : <https://schema.org/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+:Node_A :collaboratesWith :Node_B # Missing terminating dot
+:Node_C rdf:type ;                 # Missing object term
+<http://invalid-uri-space > :pred "test" .
