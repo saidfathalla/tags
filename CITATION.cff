@@ -1,14 +1,14 @@
 cff-version: 1.2.0
 message: "If you use this software or incorporate its topological metrics engine, please cite it as below."
 authors:
-  - family-names: "Fathalla"
-    given-names: "Said"
-    orcid: "https://orcid.org/0000-0002-2818-5890"
+  - family-names: "Anonymized"
+    given-names: "Anonymized"
+    orcid: "Anonymized"
 title: "TAGS: Topological Analysis of Graph Structure"
 version: "1.0.0"
 date-released: "2026-06-12"
-url: "https://github.com/saidfathalla/TAGS"
-repository-code: "https://github.com/saidfathalla/TAGS"
+url: "https://anonymous.4open.science/r/tags-0902"
+repository-code: "https://anonymous.4open.science/r/tags-0902"
 keywords:
   - "Scientometrics"
   - "Knowledge Graphs"
