@@ -1,0 +1,12 @@
+@prefix dcterms1: <https://schema.org/dcterms#> .
+@prefix void1: <https://schema.org/void#> .
+@prefix xsd1: <https://schema.org/xsd#> .
+
+<http://purls.helmholtz-metadaten.de/helmholtzkg/no_type_graph.ttl> a void1:Dataset ;
+    dcterms1:title "Topological Profile for no_type_graph.ttl"@en ;
+    void1:classes "0"^^xsd1:integer ;
+    void1:distinctObjects "3"^^xsd1:integer ;
+    void1:distinctSubjects "3"^^xsd1:integer ;
+    void1:properties "3"^^xsd1:integer ;
+    void1:triples "3"^^xsd1:integer .
+

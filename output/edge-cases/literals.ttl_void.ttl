@@ -1,0 +1,15 @@
+@prefix dcterms1: <https://schema.org/dcterms#> .
+@prefix schema: <https://schema.org/> .
+@prefix void1: <https://schema.org/void#> .
+@prefix xsd1: <https://schema.org/xsd#> .
+
+<http://purls.helmholtz-metadaten.de/helmholtzkg/literals.ttl> a void1:Dataset ;
+    dcterms1:title "Topological Profile for literals.ttl"@en ;
+    void1:classPartition [ void1:class_ schema:Person ;
+            void1:entities "1"^^xsd1:integer ] ;
+    void1:classes "1"^^xsd1:integer ;
+    void1:distinctObjects "4"^^xsd1:integer ;
+    void1:distinctSubjects "1"^^xsd1:integer ;
+    void1:properties "4"^^xsd1:integer ;
+    void1:triples "4"^^xsd1:integer .
+
