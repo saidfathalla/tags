@@ -1,0 +1,43 @@
+@prefix dcterms1: <https://schema.org/dcterms#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix void1: <https://schema.org/void#> .
+@prefix xsd1: <https://schema.org/xsd#> .
+
+<http://purls.helmholtz-metadaten.de/helmholtzkg/DBpedia-mini-samples-Berlin> a void1:Dataset ;
+    dcterms1:title "Topological Profile for DBpedia-mini-samples-Berlin"@en ;
+    void1:classPartition [ void1:class_ <http://www.wikidata.org/entity/Q486972> ;
+            void1:entities "1"^^xsd1:integer ],
+        [ void1:class_ <http://dbpedia.org/ontology/Place> ;
+            void1:entities "1"^^xsd1:integer ],
+        [ void1:class_ <http://dbpedia.org/ontology/PopulatedPlace> ;
+            void1:entities "1"^^xsd1:integer ],
+        [ void1:class_ <http://schema.org/Place> ;
+            void1:entities "1"^^xsd1:integer ],
+        [ void1:class_ <http://dbpedia.org/ontology/City> ;
+            void1:entities "1"^^xsd1:integer ],
+        [ void1:class_ <http://schema.org/City> ;
+            void1:entities "1"^^xsd1:integer ],
+        [ void1:class_ <http://www.wikidata.org/entity/Q515> ;
+            void1:entities "1"^^xsd1:integer ],
+        [ void1:class_ <http://dbpedia.org/ontology/Location> ;
+            void1:entities "1"^^xsd1:integer ],
+        [ void1:class_ <http://umbel.org/umbel/rc/PopulatedPlace> ;
+            void1:entities "1"^^xsd1:integer ],
+        [ void1:class_ <http://dbpedia.org/ontology/Settlement> ;
+            void1:entities "1"^^xsd1:integer ],
+        [ void1:class_ <http://umbel.org/umbel/rc/Location_Underspecified> ;
+            void1:entities "1"^^xsd1:integer ],
+        [ void1:class_ owl:Thing ;
+            void1:entities "1"^^xsd1:integer ],
+        [ void1:class_ <http://umbel.org/umbel/rc/City> ;
+            void1:entities "1"^^xsd1:integer ],
+        [ void1:class_ <http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing> ;
+            void1:entities "1"^^xsd1:integer ],
+        [ void1:class_ <http://umbel.org/umbel/rc/Village> ;
+            void1:entities "1"^^xsd1:integer ] ;
+    void1:classes "15"^^xsd1:integer ;
+    void1:distinctObjects "1777"^^xsd1:integer ;
+    void1:distinctSubjects "40335"^^xsd1:integer ;
+    void1:properties "484"^^xsd1:integer ;
+    void1:triples "53228"^^xsd1:integer .
+
