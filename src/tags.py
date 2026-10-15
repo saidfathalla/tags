@@ -154,18 +154,20 @@ def analyze_knowledge_graph(ttl_file, file_format=None):
                     e_i += 1
         local_cluster_coeffs[node] = (2.0 * e_i) / (k_i * (k_i - 1))
 
-    M8 = float(np.mean(list(local_cluster_coeffs.values()))) if local_cluster_coeffs else 0.0
-    M9 = M8  
+    # Local Clustering Statistics
+    coeffs_list = list(local_cluster_coeffs.values()) if local_cluster_coeffs else [0.0]
 
-    # M10: Degree Distribution Shannon Entropy
+    # M8: Maximum Local Clustering Coefficient
+    M8 = float(np.max(coeffs_list)) if coeffs_list else 0.0
+
+    # M9: Average Local Clustering Coefficient (\bar{C})
+    M9 = float(np.mean(coeffs_list)) if coeffs_list else 0.0  
+
+    
+    # M10: Degree Centrality Heterogeneity / Polarization
     degrees = [len(adj[n]) for n in instance_nodes]
-    deg_counts = Counter(degrees)
-    M10 = 0.0
-    total_nodes = len(instance_nodes)
-    if total_nodes > 0:
-        for count in deg_counts.values():
-            p_k = count / total_nodes
-            M10 -= p_k * math.log2(p_k)
+    delta_G = max(degrees) if degrees else 0
+    M10 = (float(delta_G) / M5) if M5 > 0 else 0.0
 
     # M11: Disconnected Components Discovery (BFS)
     visited = set()
@@ -230,7 +232,7 @@ def analyze_knowledge_graph(ttl_file, file_format=None):
             "M5": [M5, "Average Node Connection", "Mean edge connection weight across target nodes."],
             "M6": [M6, "Graph Density Factor", "Observed density vs absolute mathematical complete graph limits."],
             "M7": [M7, "Structural-to-Semantic Ratio", "Proportion match balancing connections against descriptive metadata labels."],
-            "M8": [M8, "Local Clustering Coefficient (Avg)", "Quantifies how close neighborhoods are to forming complete cliques."],
+            "M8": [M8, "Maximum Local Clustering Coefficient", "Peak localized neighborhood density (clique strength) across instance nodes."],
             "M9": [M9, "Average Clustering Coefficient", "Mathematical mean of localized operational clustering patterns."],
             "M10": [M10, "Degree Centrality Heterogeneity", "Shannon Entropy of the graph degree distribution."],
             "M11": [M11, "Total Disconnected Components", "Isolated sub-mesh cluster partition groupings."],
