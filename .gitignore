@@ -13,4 +13,7 @@ venv/
 # Ignore all programmatic pipeline outputs
 output/
 examples/Large-scale-data/
+benchmark_data
 env/
+tests/rdf-export-orkg.nt
+
