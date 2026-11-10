@@ -1,0 +1,15 @@
+@prefix dcterms1: <https://schema.org/dcterms#> .
+@prefix schema: <https://schema.org/> .
+@prefix void1: <https://schema.org/void#> .
+@prefix xsd1: <https://schema.org/xsd#> .
+
+<http://purls.helmholtz-metadaten.de/helmholtzkg/duplicate_triples.ttl> a void1:Dataset ;
+    dcterms1:title "Topological Profile for duplicate_triples.ttl"@en ;
+    void1:classPartition [ void1:class_ schema:Person ;
+            void1:entities "1"^^xsd1:integer ] ;
+    void1:classes "1"^^xsd1:integer ;
+    void1:distinctObjects "2"^^xsd1:integer ;
+    void1:distinctSubjects "2"^^xsd1:integer ;
+    void1:properties "2"^^xsd1:integer ;
+    void1:triples "2"^^xsd1:integer .
+
