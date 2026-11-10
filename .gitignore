@@ -11,9 +11,9 @@ venv/
 .DS_Store
 
 # Ignore all programmatic pipeline outputs
-# output/
+
+output/
+examples/Large-scale-data/
 benchmark_data
 env/
-examples/rdf-export-orkg.nt
-
-
+tests/rdf-export-orkg.nt
