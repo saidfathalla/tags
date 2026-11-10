@@ -11,7 +11,7 @@ import math
 import io
 import base64
 import argparse
-from collections import defaultdict
+from collections import defaultdict, Counter
 
 # 1. Secure Dependency Imports
 try:
@@ -42,23 +42,22 @@ def analyze_knowledge_graph(ttl_file, file_format=None):
     Parses an RDF graph via RDFLib to calculate semantic and topological analytics.
     Exposes structural counts for Data Properties, Object Properties, and Schema Classes.
     """
-    # Start with a completely blank slate (no auto-injected default namespaces)
     g = rdflib.Graph(bind_namespaces="none")
     try:
         if file_format:
             g.parse(ttl_file, format=file_format)
         else:
-            # Let rdflib automatically deduce serialization format based on file extensions
             g.parse(ttl_file)
     except Exception as e:
         print(f"[Parser Error] Failed to parse {ttl_file}: {e}")
-        return None
+        return {"error": str(e), "file_path": ttl_file}
 
     M1 = len(g)
     if M1 == 0:
+        print(f"The input RDF graph is EMPTY!")
         return None
 
-    # --- Extract Input File System Metadata & Scale Metrics ---
+    # Extraction File System Metadata
     try:
         file_bytes = os.path.getsize(ttl_file)
         if file_bytes < 1024:
@@ -77,13 +76,12 @@ def analyze_knowledge_graph(ttl_file, file_format=None):
     else:
         scale_class = "Large Enterprise Knowledge Graph (>100K triples)"
 
-    # Structural metrics initialization
+    # Metric tracking structures
     subjects = set()
     predicates = set()
     objects = set()
     classes = defaultdict(int)
     
-    # Typing variables for distinct property tracking
     object_properties = set()
     data_properties = set()
     
@@ -93,38 +91,45 @@ def analyze_knowledge_graph(ttl_file, file_format=None):
     predicate_by_subject = defaultdict(set)
     instance_predicates = set()
     
-    all_graph_nodes = set()
+    instance_nodes = set()
+    schema_classes = set()
 
+    # Pass 1: Identify schema classes first
+    for s, p, o in g:
+        if p == RDF.type:
+            schema_classes.add(o)
+
+# Pass 2: Extract instance entities and structural connections
     for s, p, o in g:
         subjects.add(s)
         predicates.add(p)
         objects.add(o)
         
-        all_graph_nodes.add(str(s))
-        if isinstance(o, (URIRef, rdflib.BNode)):
-            all_graph_nodes.add(str(o))
-        
-        # Segment properties based on W3C semantics patterns
+        s_str = f"_:{s}" if isinstance(s, rdflib.BNode) else str(s)
+        o_str = f"_:{o}" if isinstance(o, rdflib.BNode) else str(o)
+
+        if s not in schema_classes:
+            instance_nodes.add(s_str)
+            
         if p == RDF.type:
             taxonomic_triples += 1
             classes[o] += 1
         else:
-            # Check if the property acts as a Data Property (Literal values)
-            # OR if the predicate itself contains common data property keywords like 'name'
-            if isinstance(o, rdflib.Literal) or "name" in str(p).lower():
-                data_properties.add(p)
-            else:
-                object_properties.add(p)
-                
-            structural_edges.add(tuple(sorted([str(s), str(o)])))
-            adj[str(s)].add(str(o))
             if isinstance(o, (URIRef, rdflib.BNode)):
-                adj[str(o)].add(str(s))
+                if o not in schema_classes:
+                    instance_nodes.add(o_str)
+                object_properties.add(p)
+                structural_edges.add(tuple(sorted([s_str, o_str])))
+                adj[s_str].add(o_str)
+                adj[o_str].add(s_str)
+            elif isinstance(o, rdflib.Literal):
+                data_properties.add(p)
             
             instance_predicates.add(p)
-            predicate_by_subject[str(s)].add(str(p))
+            predicate_by_subject[s_str].add(str(p))
 
-    M2 = len(subjects)
+    # Metric Calculations
+    M2 = len(instance_nodes)
     M3 = len(structural_edges)
     M4 = taxonomic_triples
 
@@ -132,8 +137,9 @@ def analyze_knowledge_graph(ttl_file, file_format=None):
     M6 = (2.0 * M3) / (M2 * (M2 - 1)) if M2 > 1 else 0.0
     M7 = float(M3) / M4 if M4 > 0 else 0.0
 
+    # Local & Average Clustering Coefficient (M8 / M9)
     local_cluster_coeffs = {}
-    for node in list(adj.keys()):
+    for node in instance_nodes:
         neighbors = adj[node]
         k_i = len(neighbors)
         if k_i < 2:
@@ -148,24 +154,26 @@ def analyze_knowledge_graph(ttl_file, file_format=None):
                     e_i += 1
         local_cluster_coeffs[node] = (2.0 * e_i) / (k_i * (k_i - 1))
 
-    M8 = np.mean(list(local_cluster_coeffs.values())) if local_cluster_coeffs else 0.0
-    M9 = M8  
+    # Local Clustering Statistics
+    coeffs_list = list(local_cluster_coeffs.values()) if local_cluster_coeffs else [0.0]
 
-    max_degree = max(len(neighbors) for neighbors in adj.values()) if adj else 0
-    M10 = max_degree / M5 if M5 > 0 else 1.0
+    # M8: Maximum Local Clustering Coefficient
+    M8 = float(np.max(coeffs_list)) if coeffs_list else 0.0
 
-    total_types = sum(classes.values())
-    M16 = 0.0
-    if total_types > 0:
-        for c, count in classes.items():
-            p_c = float(count) / total_types
-            M16 -= p_c * math.log2(p_c)
+    # M9: Average Local Clustering Coefficient (\bar{C})
+    M9 = float(np.mean(coeffs_list)) if coeffs_list else 0.0  
 
+    
+    # M10: Degree Centrality Heterogeneity / Polarization
+    degrees = [len(adj[n]) for n in instance_nodes]
+    delta_G = max(degrees) if degrees else 0
+    M10 = (float(delta_G) / M5) if M5 > 0 else 0.0
+
+    # M11: Disconnected Components Discovery (BFS)
     visited = set()
     components = []
-    all_nodes = set(adj.keys())
     
-    for node in all_nodes:
+    for node in instance_nodes:
         if node not in visited:
             comp = []
             queue = [node]
@@ -181,18 +189,31 @@ def analyze_knowledge_graph(ttl_file, file_format=None):
 
     M11 = len(components)
     
-    max_comp_size = max(len(comp) for comp in components) if components else 0
-    if max_comp_size > M2:
-        max_comp_size = M2  
-        
-    M14 = float(max_comp_size) / M2 if M2 > 0 else 0.0
+    # M14: Giant Connected Component Dominance (restricted to instance nodes)
+    if components and M2 > 0:
+        max_instance_comp_size = max(
+            sum(1 for node in comp if node in instance_nodes) 
+            for comp in components
+        )
+        M14 = float(max_instance_comp_size) / M2
+    else:
+        M14 = 0.0
+    # M12: Type-Only Orphans (Degree == 0)
+    M12 = sum(1 for n in instance_nodes if len(adj[n]) == 0)
 
-    structural_nodes = set(adj.keys())
-    M12 = len([n for n in all_graph_nodes if n not in structural_nodes])
+    # M13: Weak Islands (Components with <= 2 nodes)
     M13 = sum(1 for comp in components if len(comp) <= 2)
 
-    total_instance_triples = M1 - M4
-    M15_ratio = len(instance_predicates) / total_instance_triples if total_instance_triples > 0 else 0.0
+    # M15: Dynamic Predicate Diversity Factor (normalized ratio)
+    M15 = float(len(object_properties)) / M3 if M3 > 0 else 0.0
+
+    # M16: Taxonomic Class Assignment Entropy
+    total_types = sum(classes.values())
+    M16 = 0.0
+    if total_types > 0:
+        for c, count in classes.items():
+            p_c = float(count) / total_types
+            M16 -= p_c * math.log2(p_c)
 
     sorted_hubs = sorted(adj.items(), key=lambda x: len(x[1]), reverse=True)[:5]
 
@@ -211,14 +232,14 @@ def analyze_knowledge_graph(ttl_file, file_format=None):
             "M5": [M5, "Average Node Connection", "Mean edge connection weight across target nodes."],
             "M6": [M6, "Graph Density Factor", "Observed density vs absolute mathematical complete graph limits."],
             "M7": [M7, "Structural-to-Semantic Ratio", "Proportion match balancing connections against descriptive metadata labels."],
-            "M8": [M8, "Local Clustering Coefficient (Avg)", "Quantifies how close neighborhoods are to forming complete cliques."],
+            "M8": [M8, "Maximum Local Clustering Coefficient", "Peak localized neighborhood density (clique strength) across instance nodes."],
             "M9": [M9, "Average Clustering Coefficient", "Mathematical mean of localized operational clustering patterns."],
-            "M10": [M10, "Degree Centrality Heterogeneity", "Exposes whether critical hub nodes dominate network routing. Range [1, inf)."],
+            "M10": [M10, "Degree Centrality Heterogeneity", "Shannon Entropy of the graph degree distribution."],
             "M11": [M11, "Total Disconnected Components", "Isolated sub-mesh cluster partition groupings."],
             "M12": [M12, "Type-Only Orphan Count", "Nodes possessing classification declarations but lacking structural instance properties."],
             "M13": [M13, "Prunable Weak Islands Count", "Isolated component subgraphs containing two or fewer nodes."],
             "M14": [M14, "Maximum Component Dominance Ratio", "Size ratio of the primary Giant Connected Component (GCC)."],
-            "M15": [M15_ratio, "Dynamic Predicate Diversity Factor", "Ratio of unique non-taxonomic instance properties to total instance edges. Bounded in (0, 1]."],
+            "M15": [M15, "Dynamic Predicate Diversity Factor", "Total unique non-taxonomic structural object properties evaluated."],
             "M16": [M16, "Class Imbalance Entropy", "Information metric indicating instance density spreading weights across schema classes."]
         },
         "hubs": sorted_hubs,
@@ -323,16 +344,15 @@ def display_terminal_dashboard(results, base_name):
     print("║" + title_text.ljust(border_width) + "║")
     print("╚" + "═" * border_width + "╝")
     
-    # Render Physical Asset Telemetry Summary
     print(f" - Physical File Size : {results.get('file_size', 'N/A')}")
     print(f" - Volume Scale Class : {results.get('scale_class', 'N/A')}")
     print(f" ️- Unique Schema Classes Used    : {results.get('class_count', 0)}")
     print(f" - Unique Object Properties Used : {results.get('object_property_count', 0)}")
     print(f" - Unique Data Properties Used   : {results.get('data_property_count', 0)}")
-    print("═" * (border_width -10 ))
+    print("═" * (border_width - 10))
     
     print(f" │ {'Code':<5} │ {'Metric Profile Structural Indicator':<38} │ {'Value':<13} │")
-    print("─" * (border_width -10))
+    print("─" * (border_width - 10))
     
     sorted_metrics = sorted(results['metrics'].items(), key=lambda x: int(x[0][1:]))
     for code, values in sorted_metrics:
@@ -389,10 +409,11 @@ def main():
     
     print(f"[System Execution] Commencing programmatic parsing of structural schema graph...")
     results = analyze_knowledge_graph(args.ttl_file, file_format=args.format)
-    if not results:
-        return
+    if not results or "error" in results:
+        print(f"[System Stop] Execution aborted due to malformed RDF syntax in '{args.ttl_file}'.")
+        print(f"[System Stop] Please provide a VALID RDF file.")
+        sys.exit(1)
 
-    # Mirror metric analysis arrays straight to standard terminal display
     display_terminal_dashboard(results, base_name)
     
     void_path = export_void_statistics(results, base_name, target_dir)
