@@ -17,3 +17,8 @@ examples/Large-scale-data/
 benchmark_data
 env/
 tests/rdf-export-orkg.nt
+
+# Downloaded datasets and benchmark artefacts
+data/*.nt
+results/synthetic_data/
+.venv/

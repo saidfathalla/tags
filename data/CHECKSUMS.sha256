@@ -1,0 +1,6 @@
+# SHA-256 checksums of the datasets used in the paper (path relative to repository root).
+# ORKG: replace the placeholder with the checksum of the 2026-09-07 snapshot
+#   (sha256sum data/rdf-export-orkg.nt) before release.
+5210f3343b4212b60a38f016d47637c7515ecbf41bbfa413a7cf5f93a1d94f98  tests/test_baseline.ttl
+d699b81520fef579f01fa18fd86d5b958a96d98fa1bf95d6ddbf4767e2a9e9de  examples/DBpedia-mini-samples-Berlin.ttl
+TO_BE_FILLED_WITH_SHA256_OF_2026-09-07_SNAPSHOT  data/rdf-export-orkg.nt
