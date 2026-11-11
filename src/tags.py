@@ -31,10 +31,13 @@ try:
 except ImportError:
     HAS_MATPLOTLIB = False
 
-# Establish standardized namespaces for export alignment
-VOID = Namespace("https://schema.org/void#")
-DCTERMS = Namespace("https://schema.org/dcterms#")
-XSD = Namespace("https://schema.org/xsd#")
+# Standard W3C namespaces for export alignment
+from rdflib.namespace import VOID, DCTERMS, XSD, RDFS
+from datetime import datetime, timezone
+DQV = Namespace("http://www.w3.org/ns/dqv#")
+# TAGS metric vocabulary (M1-M16). The IRI must resolve to tags_vocab.ttl once
+# published (e.g., via w3id.org or the project repository); replace if needed.
+TAGS = Namespace("https://w3id.org/tags/vocab#")
 
 
 def analyze_knowledge_graph(ttl_file, file_format=None):
@@ -218,29 +221,29 @@ def analyze_knowledge_graph(ttl_file, file_format=None):
     sorted_hubs = sorted(adj.items(), key=lambda x: len(x[1]), reverse=True)[:5]
 
     return {
-        "raw_counts": {"triples": M1, "subjects": M2, "properties": len(predicates), "objects": len(objects), "classes": len(classes)},
+        "raw_counts": {"triples": M1, "subjects": len(subjects), "properties": len(predicates), "objects": len(objects), "classes": len(classes)},
         "file_size": file_size_str,
         "scale_class": scale_class,
         "class_count": len(classes),
         "object_property_count": len(object_properties),
         "data_property_count": len(data_properties),
         "metrics": {
-            "M1": [M1, "Total Asserted Triples", "Total explicit statements parsed from data."],
-            "M2": [M2, "Unique Entity Nodes", "Total graph instances exclusive of abstract schemas."],
-            "M3": [M3, "Structural Object Links", "Total unique undirected object property graph edges."],
-            "M4": [M4, "Taxonomic Type Assertions", "Total core classification declarations (rdf:type)."],
-            "M5": [M5, "Average Node Connection", "Mean edge connection weight across target nodes."],
-            "M6": [M6, "Graph Density Factor", "Observed density vs absolute mathematical complete graph limits."],
-            "M7": [M7, "Structural-to-Semantic Ratio", "Proportion match balancing connections against descriptive metadata labels."],
-            "M8": [M8, "Maximum Local Clustering Coefficient", "Peak localized neighborhood density (clique strength) across instance nodes."],
-            "M9": [M9, "Average Clustering Coefficient", "Mathematical mean of localized operational clustering patterns."],
-            "M10": [M10, "Degree Centrality Heterogeneity", "Shannon Entropy of the graph degree distribution."],
-            "M11": [M11, "Total Disconnected Components", "Isolated sub-mesh cluster partition groupings."],
-            "M12": [M12, "Type-Only Orphan Count", "Nodes possessing classification declarations but lacking structural instance properties."],
-            "M13": [M13, "Prunable Weak Islands Count", "Isolated component subgraphs containing two or fewer nodes."],
-            "M14": [M14, "Maximum Component Dominance Ratio", "Size ratio of the primary Giant Connected Component (GCC)."],
-            "M15": [M15, "Dynamic Predicate Diversity Factor", "Total unique non-taxonomic structural object properties evaluated."],
-            "M16": [M16, "Class Imbalance Entropy", "Information metric indicating instance density spreading weights across schema classes."]
+            "M1": [M1, "Total Asserted Triples", "Number of triples in the RDF graph."],
+            "M2": [M2, "Unique Entity Nodes", "Number of instance nodes (IRIs and blank nodes) excluding schema classes and literals."],
+            "M3": [M3, "Structural Object Links", "Number of undirected instance-level edges; rdf:type and literal triples excluded, parallel and inverse links collapsed."],
+            "M4": [M4, "Taxonomic Type Assertions", "Number of rdf:type triples."],
+            "M5": [M5, "Average Node Connection", "Average degree of the instance-level undirected graph (2|E|/|V|)."],
+            "M6": [M6, "Graph Density Factor", "Ratio of instance-level edges to the maximum possible number of edges."],
+            "M7": [M7, "Structural-to-Semantic Ratio", "Ratio of instance-level edges (M3) to rdf:type assertions (M4)."],
+            "M8": [M8, "Maximum Clustering Coefficient", "Maximum local clustering coefficient over instance nodes."],
+            "M9": [M9, "Average Clustering Coefficient", "Mean local clustering coefficient over instance nodes."],
+            "M10": [M10, "Degree Centrality Polarization", "Ratio of the maximum degree to the average degree (M5)."],
+            "M11": [M11, "Total Disconnected Components", "Number of connected components of the instance-level graph."],
+            "M12": [M12, "Type-Only Orphan Count", "Number of instance nodes with no incident instance-level edge."],
+            "M13": [M13, "Prunable Weak Islands Count", "Number of connected components with at most two nodes."],
+            "M14": [M14, "Maximum Component Dominance Ratio", "Fraction of instance nodes in the largest connected component."],
+            "M15": [M15, "Dynamic Predicate Diversity Factor", "Number of distinct object properties divided by the number of instance-level edges (M3)."],
+            "M16": [M16, "Class Imbalance Entropy", "Shannon entropy (base 2) of the distribution of rdf:type assertions over classes."]
         },
         "hubs": sorted_hubs,
         "classes": classes,
@@ -249,16 +252,42 @@ def analyze_knowledge_graph(ttl_file, file_format=None):
     }
 
 
+def export_metric_vocabulary(results, output_dir):
+    """Writes the TAGS metric vocabulary: one dqv:Metric per metric M1-M16."""
+    vg = rdflib.Graph()
+    vg.bind("dqv", DQV)
+    vg.bind("tags", TAGS)
+    vg.bind("rdfs", RDFS)
+    for code, (_, name, desc) in results["metrics"].items():
+        m = TAGS[code]
+        vg.add((m, RDF.type, DQV.Metric))
+        vg.add((m, RDFS.label, Literal(f"{code}: {name}", lang="en")))
+        vg.add((m, RDFS.comment, Literal(desc, lang="en")))
+    path = os.path.join(output_dir, "tags_vocab.ttl")
+    vg.serialize(destination=path, format="turtle")
+    return path
+
+
 def export_void_statistics(results, base_name, output_dir):
-    """Generates a machine-readable W3C VoID metadata profile."""
+    """Generates a machine-readable W3C VoID profile.
+
+    Dataset-level statistics with a VoID equivalent are written as VoID
+    properties (e.g., void:triples = M1); all sixteen TAGS metrics are
+    additionally attached as W3C DQV quality measurements, so profiles of
+    different datasets or snapshots can be compared programmatically.
+    """
     void_g = rdflib.Graph()
     void_g.bind("void", VOID)
     void_g.bind("dcterms", DCTERMS)
     void_g.bind("xsd", XSD)
-    
+    void_g.bind("dqv", DQV)
+    void_g.bind("tags", TAGS)
+
     dataset_uri = URIRef(f"http://purls.helmholtz-metadaten.de/helmholtzkg/{base_name}")
     void_g.add((dataset_uri, RDF.type, VOID.Dataset))
     void_g.add((dataset_uri, DCTERMS.title, Literal(f"Topological Profile for {base_name}", lang="en")))
+    void_g.add((dataset_uri, DCTERMS.modified,
+                Literal(datetime.now(timezone.utc).isoformat(timespec="seconds"), datatype=XSD.dateTime)))
     void_g.add((dataset_uri, VOID.triples, Literal(results['raw_counts']['triples'], datatype=XSD.integer)))
     void_g.add((dataset_uri, VOID.properties, Literal(results['raw_counts']['properties'], datatype=XSD.integer)))
     void_g.add((dataset_uri, VOID.classes, Literal(results['raw_counts']['classes'], datatype=XSD.integer)))
@@ -269,8 +298,18 @@ def export_void_statistics(results, base_name, output_dir):
         if isinstance(cls_uri, URIRef):
             partition = rdflib.BNode()
             void_g.add((dataset_uri, VOID.classPartition, partition))
-            void_g.add((partition, VOID.class_, cls_uri))
+            void_g.add((partition, VOID["class"], cls_uri))
             void_g.add((partition, VOID.entities, Literal(count, datatype=XSD.integer)))
+
+    # All sixteen TAGS metrics as DQV quality measurements
+    for code, (value, _, _) in results["metrics"].items():
+        meas = rdflib.BNode()
+        dtype = XSD.integer if isinstance(value, int) else XSD.double
+        void_g.add((dataset_uri, DQV.hasQualityMeasurement, meas))
+        void_g.add((meas, RDF.type, DQV.QualityMeasurement))
+        void_g.add((meas, DQV.isMeasurementOf, TAGS[code]))
+        void_g.add((meas, DQV.computedOn, dataset_uri))
+        void_g.add((meas, DQV.value, Literal(value, datatype=dtype)))
 
     void_out_path = os.path.join(output_dir, f"{base_name}_void.ttl")
     void_g.serialize(destination=void_out_path, format="turtle")
@@ -405,7 +444,8 @@ def main():
         target_dir = args.output_dir
 
     os.makedirs(target_dir, exist_ok=True)
-    base_name = os.path.basename(args.ttl_file) 
+    source_name = os.path.basename(args.ttl_file)          # e.g., test_baseline.ttl
+    base_name = os.path.splitext(source_name)[0]            # e.g., test_baseline
     
     print(f"[System Execution] Commencing programmatic parsing of structural schema graph...")
     results = analyze_knowledge_graph(args.ttl_file, file_format=args.format)
@@ -414,17 +454,20 @@ def main():
         print(f"[System Stop] Please provide a VALID RDF file.")
         sys.exit(1)
 
-    display_terminal_dashboard(results, base_name)
+    display_terminal_dashboard(results, source_name)
     
     void_path = export_void_statistics(results, base_name, target_dir)
-    print(f"[FAIR Data Success] Reusable W3C VoID stats exported to: {void_path}")
+    vocab_path = export_metric_vocabulary(results, target_dir)
+    print(f"[FAIR Data Success] Reusable W3C VoID/DQV profile exported to: {void_path}")
+    print(f"[FAIR Data Success] TAGS metric vocabulary exported to: {vocab_path}")
     
     p1_b64, p2_b64 = "", ""
     if HAS_MATPLOTLIB:
         p1_b64, p2_b64 = generate_advanced_plots(results, target_dir, base_name)
     
     generate_html_dashboard(results, base_name, target_dir, p1_b64, p2_b64, void_path)
-    print(f"[System Success] Responsive analytics dashboard updated successfully to: {target_dir}\n")
+    html_path = os.path.join(target_dir, f"{base_name}_dashboard.html")
+    print(f"[System Success] Responsive analytics dashboard exported to: {html_path}\n")
 
 
 if __name__ == "__main__":
