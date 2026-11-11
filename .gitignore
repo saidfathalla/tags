@@ -3,7 +3,7 @@ __pycache__/
 *.py[cod]
 
 # Environments
-venv/
+.venv/
 .env
 
 
@@ -15,5 +15,4 @@ venv/
 output/
 examples/Large-scale-data/
 benchmark_data
-env/
 tests/rdf-export-orkg.nt

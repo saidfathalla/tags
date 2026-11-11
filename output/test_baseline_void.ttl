@@ -1,19 +1,86 @@
-@prefix dcterms1: <https://schema.org/dcterms#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix dqv: <http://www.w3.org/ns/dqv#> .
 @prefix schema: <https://schema.org/> .
-@prefix void1: <https://schema.org/void#> .
-@prefix xsd1: <https://schema.org/xsd#> .
+@prefix tags: <https://w3id.org/tags/vocab#> .
+@prefix void: <http://rdfs.org/ns/void#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<http://purls.helmholtz-metadaten.de/helmholtzkg/test_baseline.ttl> a void1:Dataset ;
-    dcterms1:title "Topological Profile for test_baseline.ttl"@en ;
-    void1:classPartition [ void1:class_ schema:Project ;
-            void1:entities "2"^^xsd1:integer ],
-        [ void1:class_ schema:Researcher ;
-            void1:entities "2"^^xsd1:integer ],
-        [ void1:class_ schema:Dataset ;
-            void1:entities "3"^^xsd1:integer ] ;
-    void1:classes "3"^^xsd1:integer ;
-    void1:distinctObjects "8"^^xsd1:integer ;
-    void1:distinctSubjects "7"^^xsd1:integer ;
-    void1:properties "8"^^xsd1:integer ;
-    void1:triples "14"^^xsd1:integer .
+<http://purls.helmholtz-metadaten.de/helmholtzkg/test_baseline> a void:Dataset ;
+    dcterms:modified "2026-11-10T15:06:44+00:00"^^xsd:dateTime ;
+    dcterms:title "Topological Profile for test_baseline"@en ;
+    void:classPartition [ void:class schema:Project ;
+            void:entities 2 ],
+        [ void:class schema:Researcher ;
+            void:entities 2 ],
+        [ void:class schema:Dataset ;
+            void:entities 3 ] ;
+    void:classes 3 ;
+    void:distinctObjects 8 ;
+    void:distinctSubjects 7 ;
+    void:properties 8 ;
+    void:triples 14 ;
+    dqv:hasQualityMeasurement [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/test_baseline> ;
+            dqv:isMeasurementOf tags:M9 ;
+            dqv:value 2.380952e-01 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/test_baseline> ;
+            dqv:isMeasurementOf tags:M2 ;
+            dqv:value 7 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/test_baseline> ;
+            dqv:isMeasurementOf tags:M11 ;
+            dqv:value 2 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/test_baseline> ;
+            dqv:isMeasurementOf tags:M5 ;
+            dqv:value 2e+00 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/test_baseline> ;
+            dqv:isMeasurementOf tags:M7 ;
+            dqv:value 1e+00 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/test_baseline> ;
+            dqv:isMeasurementOf tags:M12 ;
+            dqv:value 1 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/test_baseline> ;
+            dqv:isMeasurementOf tags:M8 ;
+            dqv:value 1e+00 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/test_baseline> ;
+            dqv:isMeasurementOf tags:M13 ;
+            dqv:value 1 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/test_baseline> ;
+            dqv:isMeasurementOf tags:M1 ;
+            dqv:value 14 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/test_baseline> ;
+            dqv:isMeasurementOf tags:M3 ;
+            dqv:value 7 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/test_baseline> ;
+            dqv:isMeasurementOf tags:M16 ;
+            dqv:value 1.556657e+00 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/test_baseline> ;
+            dqv:isMeasurementOf tags:M15 ;
+            dqv:value 1e+00 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/test_baseline> ;
+            dqv:isMeasurementOf tags:M10 ;
+            dqv:value 1.5e+00 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/test_baseline> ;
+            dqv:isMeasurementOf tags:M4 ;
+            dqv:value 7 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/test_baseline> ;
+            dqv:isMeasurementOf tags:M14 ;
+            dqv:value 8.571429e-01 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/test_baseline> ;
+            dqv:isMeasurementOf tags:M6 ;
+            dqv:value 3.333333e-01 ] .
 
