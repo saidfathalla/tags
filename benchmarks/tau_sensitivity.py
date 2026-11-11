@@ -36,11 +36,7 @@ def main():
     print(f"{'tau':>5} {'N_weak':>12} {'% of M11':>10}")
     for t in a.taus:
         n = sum(1 for s in sizes if s <= t)
-        print(f"{t:>5} {n:>12,} {100.0 * n / m11 if m11 else 0.0:>9.1f}%")
-    print("\nLaTeX rows:")
-    for t in a.taus:
-        n = sum(1 for s in sizes if s <= t)
-        print(f"{t} & {n:,} & {100.0 * n / m11 if m11 else 0.0:.1f} \\\\")
+        print(f"{t:>5} {n:>12,} {100.0 * n / m11 if m11 else 0.0:>9.2f}%")
 
 
 if __name__ == "__main__":

@@ -25,24 +25,24 @@ Profilers that treat every RDF triple as a graph edge let class nodes act as art
 
 ## Metric Summary
 
-| ID | Metric | Range | Definition |
-| :-- | :-- | :-- | :-- |
-| **M1** | Total Asserted Triples | $[0, \infty)$ | Number of triples |
-| **M2** | Unique Entity Nodes | $[0, \infty)$ | Instance nodes (IRIs and blank nodes, excluding schema classes and literals) |
-| **M3** | Structural Object Links | $[0, \infty)$ | Undirected instance-level edges (collapsed) |
-| **M4** | Taxonomic Type Assertions | $[0, \infty)$ | Number of `rdf:type` triples |
-| **M5** | Average Node Connection | $[0, \vert V\vert-1]$ | $2\vert E\vert/\vert V\vert$ |
-| **M6** | Graph Density Factor | $[0, 1]$ | $2\vert E\vert/(\vert V\vert(\vert V\vert-1))$ |
-| **M7** | Structural-to-Semantic Ratio | $[0, \infty)$ | $M_3 / M_4$ |
-| **M8** | Maximum Local Clustering Coefficient | $[0, 1]$ | Maximum local clustering coefficient |
-| **M9** | Average Clustering Coefficient | $[0, 1]$ | Mean local clustering coefficient |
-| **M10** | Degree Centrality Polarization | $[1, \vert V\vert/2]$ for connected graphs | Maximum degree / average degree |
-| **M11** | Total Disconnected Components | $[1, \vert V\vert]$ | Number of connected components |
-| **M12** | Type-Only Orphan Count | $[0, \vert V\vert]$ | `rdf:type`-annotated instance nodes with no structural edge |
-| **M13** | Prunable Weak Islands Count | $[0, M_{11}]$ | Components with at most $\tau$ nodes (`--tau`, default 2) |
-| **M14** | Maximum Component Dominance Ratio | $[1/\vert V\vert, 1]$ | Share of instance nodes in the largest component |
-| **M15** | Dynamic Predicate Diversity Factor | $[0, 1]$ | Distinct object properties / object-property triples |
-| **M16** | Class Imbalance Entropy | $[0, \log_2 \vert C\vert]$ | Shannon entropy of `rdf:type` assertions over classes |
+| ID      | Metric                               | Range                                      | Definition                                                                   |
+| :------ | :----------------------------------- | :----------------------------------------- | :--------------------------------------------------------------------------- |
+| **M1**  | Total Asserted Triples               | $[0, \infty)$                              | Number of triples                                                            |
+| **M2**  | Unique Entity Nodes                  | $[0, \infty)$                              | Instance nodes (IRIs and blank nodes, excluding schema classes and literals) |
+| **M3**  | Structural Object Links              | $[0, \infty)$                              | Undirected instance-level edges (collapsed)                                  |
+| **M4**  | Taxonomic Type Assertions            | $[0, \infty)$                              | Number of `rdf:type` triples                                                 |
+| **M5**  | Average Node Connection              | $[0, \vert V\vert-1]$                      | $2\vert E\vert/\vert V\vert$                                                 |
+| **M6**  | Graph Density Factor                 | $[0, 1]$                                   | $2\vert E\vert/(\vert V\vert(\vert V\vert-1))$                               |
+| **M7**  | Structural-to-Semantic Ratio         | $[0, \infty)$                              | $M_3 / M_4$                                                                  |
+| **M8**  | Maximum Local Clustering Coefficient | $[0, 1]$                                   | Maximum local clustering coefficient                                         |
+| **M9**  | Average Clustering Coefficient       | $[0, 1]$                                   | Mean local clustering coefficient                                            |
+| **M10** | Degree Centrality Polarization       | $[1, \vert V\vert/2]$ for connected graphs | Maximum degree / average degree                                              |
+| **M11** | Total Disconnected Components        | $[1, \vert V\vert]$                        | Number of connected components                                               |
+| **M12** | Type-Only Orphan Count               | $[0, \vert V\vert]$                        | `rdf:type`-annotated instance nodes with no structural edge                  |
+| **M13** | Prunable Weak Islands Count          | $[0, M_{11}]$                              | Components with at most $\tau$ nodes (`--tau`, default 2)                    |
+| **M14** | Maximum Component Dominance Ratio    | $[1/\vert V\vert, 1]$                      | Share of instance nodes in the largest component                             |
+| **M15** | Dynamic Predicate Diversity Factor   | $[0, 1]$                                   | Distinct object properties / object-property triples                         |
+| **M16** | Class Imbalance Entropy              | $[0, \log_2 \vert C\vert]$                 | Shannon entropy of `rdf:type` assertions over classes                        |
 
 Instance nodes with no structural edge and no `rdf:type` are not counted in $M_{12}$; they are reported separately as a diagnostic.
 
@@ -68,12 +68,12 @@ pip install -r requirements.txt
 python3 src/tags.py <rdf_file> [-o OUTPUT_DIR] [-f FORMAT] [--tau TAU] [--flat]
 ```
 
-| Option | Meaning |
-| :-- | :-- |
-| `-o`, `--output-dir` | Output folder (default: `output/` in the repository) |
-| `-f`, `--format` | RDF format (`turtle`, `nt`, `xml`, `json-ld`, ...); guessed from the extension if omitted |
-| `--tau` | Threshold for prunable weak islands $M_{13}$ (default: 2) |
-| `--flat` | Ablation mode: keep `rdf:type` triples as edges (no taxonomic isolation) |
+| Option               | Meaning                                                                                   |
+| :------------------- | :---------------------------------------------------------------------------------------- |
+| `-o`, `--output-dir` | Output folder (default: `output/` in the repository)                                      |
+| `-f`, `--format`     | RDF format (`turtle`, `nt`, `xml`, `json-ld`, ...); guessed from the extension if omitted |
+| `--tau`              | Threshold for prunable weak islands $M_{13}$ (default: 2)                                 |
+| `--flat`             | Ablation mode: keep `rdf:type` triples as edges (no taxonomic isolation)                  |
 
 Example:
 
@@ -105,7 +105,7 @@ The suite checks all 16 metrics on $G_{ref}$ (`tests/test_baseline.ttl`) within 
 
 ## Reproducing the Results of the Paper
 
-All commands are run from the repository root after installation. Timing results depend on hardware; the paper's measurements were taken on an AMD Ryzen 7 PRO 5850U (16 logical cores), 16 GB RAM, Ubuntu, Python 3.12.3.
+All commands are run from the repository root after installation. Timing results depend on hardware; the paper's measurements were taken on an Intel Core Ultra 5 225U (14 logical cores), 32 GB RAM, 1 TB NVMe SSD, Ubuntu 24.04.5 LTS, Python 3.12.3.
 
 **1. Datasets**
 
@@ -163,15 +163,15 @@ Compares a single-pass NetworkX graph with `rdf:type` edges, the same graph afte
 python3 src/tags.py examples/DBpedia-mini-samples-Berlin.ttl
 ```
 
-| Metric | Value |
-| :-- | :-- |
-| Total Asserted Triples ($M_1$) | 53,228 |
-| Unique Entity Nodes ($M_2$) | 41,208 |
-| Structural Object Links ($M_3$) | 41,207 |
-| Taxonomic Type Assertions ($M_4$) | 15 |
-| Average Node Connection ($M_5$) | 1.99995 |
-| Degree Centrality Polarization ($M_{10}$) | 20,604 |
-| Total Disconnected Components ($M_{11}$) | 1 |
+| Metric                                    | Value   |
+| :---------------------------------------- | :------ |
+| Total Asserted Triples ($M_1$)            | 53,228  |
+| Unique Entity Nodes ($M_2$)               | 41,208  |
+| Structural Object Links ($M_3$)           | 41,207  |
+| Taxonomic Type Assertions ($M_4$)         | 15      |
+| Average Node Connection ($M_5$)           | 1.99995 |
+| Degree Centrality Polarization ($M_{10}$) | 20,604  |
+| Total Disconnected Components ($M_{11}$)  | 1       |
 
 The file describes a single resource, so almost every triple has `dbr:Berlin` as subject or object: the structural graph is a star with `dbr:Berlin` as hub (degree 41,207) and $M_{10} = |V|/2$, the maximum for a connected graph. One self-loop is ignored.
 

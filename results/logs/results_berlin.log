@@ -1,0 +1,10 @@
+[DBpedia-mini-samples-Berlin.ttl]
+    run 1: 19.720 s, peak RSS delta 112.53 MB
+    run 2: 19.803 s, peak RSS delta 112.54 MB
+    run 3: 19.788 s, peak RSS delta 112.51 MB
+    run 4: 19.768 s, peak RSS delta 112.53 MB
+    run 5: 19.757 s, peak RSS delta 112.81 MB
+
+Environment: Python 3.12.3, rdflib 7.0.0, psutil 5.9.5, Linux 6.17.0-1033-oem, CPU: x86_64, 14 logical cores, RAM 30.8 GB
+Time:            mean 19.767 s, SD 0.032 s, 95% CI [19.728, 19.807] s
+Peak RSS delta:  mean 112.58 MB, SD 0.13 MB, 95% CI [112.42, 112.74] MB

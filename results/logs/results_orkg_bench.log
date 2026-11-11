@@ -1,0 +1,10 @@
+[rdf-export-orkg.nt]
+    run 1: 169.992 s, peak RSS delta 10326.50 MB
+    run 2: 170.315 s, peak RSS delta 10327.78 MB
+    run 3: 169.058 s, peak RSS delta 10327.06 MB
+    run 4: 168.982 s, peak RSS delta 10343.71 MB
+    run 5: 169.572 s, peak RSS delta 10328.17 MB
+
+Environment: Python 3.12.3, rdflib 7.0.0, psutil 5.9.5, Linux 6.17.0-1033-oem, CPU: x86_64, 14 logical cores, RAM 30.8 GB
+Time:            mean 169.584 s, SD 0.579 s, 95% CI [168.865, 170.302] s
+Peak RSS delta:  mean 10330.64 MB, SD 7.33 MB, 95% CI [10321.54, 10339.75] MB
