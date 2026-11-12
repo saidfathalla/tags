@@ -178,16 +178,18 @@ def cmd_synthetic(args):
     loglog = linfit([math.log10(x) for x in xs], [math.log10(s["time_mean_s"]) for s in summary])
 
     print("\nEnvironment:", environment())
-    print("\nTable 5 (measured):  triples & mean time (s) & SD (s) & 95% CI (s) & peak RSS delta (MB)")
+    print(f"\nMeasured ({args.runs} runs per size)")
+    print(f"{'triples':>12} {'mean time (s)':>14} {'SD (s)':>9} {'95% CI (s)':>22} {'peak RSS delta (MB)':>20}")
     for s in summary:
-        print(f"  {s['triples']:,} & {s['time_mean_s']:.3f} & {s['time_sd_s']:.3f} & "
-              f"[{s['time_ci95_low']:.3f}, {s['time_ci95_high']:.3f}] & {s['rss_mean_mb']:.2f} \\\\")
+        ci = f"[{s['time_ci95_low']:.3f}, {s['time_ci95_high']:.3f}]"
+        print(f"{s['triples']:>12,} {s['time_mean_s']:>14.3f} {s['time_sd_s']:>9.3f} {ci:>22} {s['rss_mean_mb']:>20.2f}")
     print(f"\nLinear fit (time):   t = {fit_t[0]:.4e} * |T| + {fit_t[1]:.4f}   (R^2 = {fit_t[2]:.4f})")
     print(f"Log-log fit (time):  slope = {loglog[0]:.4f}   (R^2 = {loglog[2]:.4f})")
     if extra:
-        print("\nTable 6 (extrapolated):  triples & projected time (s) & projected peak RSS delta (MB)")
+        print("\nExtrapolated from the linear fits")
+        print(f"{'triples':>12} {'projected time (s)':>19} {'projected peak RSS delta (MB)':>30}")
         for e in extra:
-            print(f"  {e['triples']:,} & {e['projected_time_s']:.3f} & {e['projected_peak_rss_delta_mb']:.2f} \\\\")
+            print(f"{e['triples']:>12,} {e['projected_time_s']:>19.3f} {e['projected_peak_rss_delta_mb']:>30.2f}")
     plot(summary, loglog, os.path.join(args.out, "tags_scalability.png"))
 
 
@@ -240,7 +242,7 @@ def plot(summary, loglog, path):
     ax.legend()
     fig.tight_layout()
     fig.savefig(path, dpi=300)
-    print(f"\nFigure saved to {path}")
+    print(f"\nFigure saved to {os.path.relpath(path)}")
 
 
 def main():

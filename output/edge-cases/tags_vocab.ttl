@@ -1,0 +1,73 @@
+@prefix dqv: <http://www.w3.org/ns/dqv#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix tags: <https://w3id.org/tags/vocab#> .
+
+tags:M1 a dqv:Metric ;
+    rdfs:label "M1: Total Asserted Triples"@en ;
+    rdfs:comment "Number of triples in the RDF graph."@en .
+
+tags:M10 a dqv:Metric ;
+    rdfs:label "M10: Degree Centrality Polarization"@en ;
+    rdfs:comment "Ratio of the maximum degree to the average degree (M5)."@en .
+
+tags:M11 a dqv:Metric ;
+    rdfs:label "M11: Total Disconnected Components"@en ;
+    rdfs:comment "Number of connected components of the instance-level graph."@en .
+
+tags:M12 a dqv:Metric ;
+    rdfs:label "M12: Type-Only Orphan Count"@en ;
+    rdfs:comment "Number of rdf:type-annotated instance nodes with no incident instance-level edge."@en .
+
+tags:M13 a dqv:Metric ;
+    rdfs:label "M13: Prunable Weak Islands Count"@en ;
+    rdfs:comment "Number of connected components with at most tau nodes; tau is recorded in the profile as tags:weakIslandThreshold."@en .
+
+tags:M14 a dqv:Metric ;
+    rdfs:label "M14: Maximum Component Dominance Ratio"@en ;
+    rdfs:comment "Fraction of instance nodes in the largest connected component."@en .
+
+tags:M15 a dqv:Metric ;
+    rdfs:label "M15: Dynamic Predicate Diversity Factor"@en ;
+    rdfs:comment "Number of distinct object properties divided by the number of object-property triples (before edge collapsing); range [0, 1]."@en .
+
+tags:M16 a dqv:Metric ;
+    rdfs:label "M16: Class Imbalance Entropy"@en ;
+    rdfs:comment "Shannon entropy (base 2) of the distribution of rdf:type assertions over classes."@en .
+
+tags:M2 a dqv:Metric ;
+    rdfs:label "M2: Unique Entity Nodes"@en ;
+    rdfs:comment "Number of instance nodes (IRIs and blank nodes) excluding schema classes and literals."@en .
+
+tags:M3 a dqv:Metric ;
+    rdfs:label "M3: Structural Object Links"@en ;
+    rdfs:comment "Number of undirected instance-level edges; rdf:type and literal triples excluded, parallel and inverse links collapsed."@en .
+
+tags:M4 a dqv:Metric ;
+    rdfs:label "M4: Taxonomic Type Assertions"@en ;
+    rdfs:comment "Number of rdf:type triples."@en .
+
+tags:M5 a dqv:Metric ;
+    rdfs:label "M5: Average Node Connection"@en ;
+    rdfs:comment "Average degree of the instance-level undirected graph (2|E|/|V|)."@en .
+
+tags:M6 a dqv:Metric ;
+    rdfs:label "M6: Graph Density Factor"@en ;
+    rdfs:comment "Ratio of instance-level edges to the maximum possible number of edges."@en .
+
+tags:M7 a dqv:Metric ;
+    rdfs:label "M7: Structural-to-Semantic Ratio"@en ;
+    rdfs:comment "Ratio of instance-level edges (M3) to rdf:type assertions (M4)."@en .
+
+tags:M8 a dqv:Metric ;
+    rdfs:label "M8: Maximum Clustering Coefficient"@en ;
+    rdfs:comment "Maximum local clustering coefficient over instance nodes."@en .
+
+tags:M9 a dqv:Metric ;
+    rdfs:label "M9: Average Clustering Coefficient"@en ;
+    rdfs:comment "Mean local clustering coefficient over instance nodes."@en .
+
+tags:weakIslandThreshold a rdf:Property ;
+    rdfs:label "weak island threshold (tau)"@en ;
+    rdfs:comment "Node-count threshold tau used to compute M13 in this profile."@en .
+

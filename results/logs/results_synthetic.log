@@ -39,4 +39,4 @@ Table 6 (extrapolated):  triples & projected time (s) & projected peak RSS delta
   10,000,000 & 252.017 & 26963.41 \\
   50,000,000 & 1260.544 & 134812.34 \\
 
-Figure saved to /home/said/Sciebo/FZJ-work/GitRepos/TAGS/results/tags_scalability.png
+Figure saved to results/tags_scalability.png
