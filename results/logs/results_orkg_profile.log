@@ -1,0 +1,44 @@
+[System Execution] Commencing programmatic parsing of structural schema graph...
+
+╔═══════════════════════════════════════════════════════════════════╗
+║ FAIR STRUCTURAL METRICS ENGINE PROFILE REPORT: rdf-export-orkg.nt ║
+╚═══════════════════════════════════════════════════════════════════╝
+ - Physical File Size : 866.42 MB
+ - Volume Scale Class : Large Enterprise Knowledge Graph (>100K triples)
+ ️- Unique Schema Classes Used    : 2085
+ - Unique Object Properties Used : 4972
+ - Unique Data Properties Used   : 9947
+═════════════════════════════════════════════════════════
+ │ Code  │ Metric Profile Structural Indicator    │ Value         │
+─────────────────────────────────────────────────────────
+ │ M1    │ Total Asserted Triples                 │     6,415,928 │
+ │ M2    │ Unique Entity Nodes                    │     1,102,771 │
+ │ M3    │ Structural Object Links                │     1,572,751 │
+ │ M4    │ Taxonomic Type Assertions              │     2,003,865 │
+ │ M5    │ Average Node Connection                │       2.85236 │
+ │ M6    │ Graph Density Factor                   │       0.00000 │
+ │ M7    │ Structural-to-Semantic Ratio           │       0.78486 │
+ │ M8    │ Maximum Clustering Coefficient         │       1.00000 │
+ │ M9    │ Average Clustering Coefficient         │       0.00510 │
+ │ M10   │ Degree Centrality Polarization         │    6945.12148 │
+ │ M11   │ Total Disconnected Components          │       147,828 │
+ │ M12   │ Type-Only Orphan Count                 │       145,803 │
+ │ M13   │ Prunable Weak Islands Count            │       147,504 │
+ │ M14   │ Maximum Component Dominance Ratio      │       0.85646 │
+ │ M15   │ Dynamic Predicate Diversity Factor     │       0.00314 │
+ │ M16   │ Class Imbalance Entropy                │       3.39936 │
+─────────────────────────────────────────────────────────────────────
+ │ TOPOLOGICAL HUBS DISCOVERED (HIGHEST CENTRALITY DEGREE PATHS)
+─────────────────────────────────────────────────────────────────────
+ │ Rank [01]  Degree: 19810  URI: <http://orkg.org/orkg/resource/R132              >
+ │ Rank [02]  Degree: 13979  URI: <http://orkg.org/orkg/resource/R52               >
+ │ Rank [03]  Degree: 10086  URI: <http://orkg.org/orkg/resource/R722845           >
+ │ Rank [04]  Degree: 8867  URI: <http://orkg.org/orkg/resource/R708567           >
+ │ Rank [05]  Degree: 7473  URI: <http://orkg.org/orkg/resource/R11               >
+ │ Diagnostics: tau = 2, taxonomic isolation = True, untyped isolated nodes = 1081, self-loops ignored = 72
+═════════════════════════════════════════════════════════════════════
+
+[FAIR Data Success] Reusable W3C VoID/DQV profile exported to: output/rdf-export-orkg_void.ttl
+[FAIR Data Success] TAGS metric vocabulary exported to: output/tags_vocab.ttl
+[System Success] Responsive analytics dashboard exported to: output/rdf-export-orkg_dashboard.html
+

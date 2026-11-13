@@ -1,0 +1,18 @@
+# 12-triple example used in the paper's projection figure (fig:projection_example).
+@prefix ex: <http://example.org/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+ex:a1 rdf:type ex:Person .
+ex:p1 rdf:type ex:Paper .
+ex:p2 rdf:type ex:Paper .
+ex:v1 rdf:type ex:Venue .
+ex:d1 rdf:type ex:Dataset .
+
+ex:p1 ex:creator ex:a1 .
+ex:a1 ex:made ex:p1 .          # inverse of creator: collapsed with it
+ex:p1 ex:cites ex:p2 .
+ex:p1 ex:extends ex:p2 .       # second predicate between p1 and p2: collapsed
+ex:p2 ex:publishedIn ex:v1 .
+
+ex:p1 ex:title "Graph profiling" .
+ex:d1 ex:title "ORKG dump" .   # d1 is typed and carries only a literal -> type-only orphan

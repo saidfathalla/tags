@@ -1,0 +1,5 @@
+# SHA-256 checksums of the datasets used in the paper (path relative to repository root).
+# ORKG: snapshot of https://orkg.org/files/rdf-dumps/rdf-export-orkg.nt retrieved 2026-09-07 (908 MB).
+5210f3343b4212b60a38f016d47637c7515ecbf41bbfa413a7cf5f93a1d94f98  tests/test_baseline.ttl
+d699b81520fef579f01fa18fd86d5b958a96d98fa1bf95d6ddbf4767e2a9e9de  examples/DBpedia-mini-samples-Berlin.ttl
+57dac24f34642a1de2cc1411da2db599f1557480dbce26ca5360fd1dea13e444  data/rdf-export-orkg.nt

@@ -1,43 +1,111 @@
-@prefix dcterms1: <https://schema.org/dcterms#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix dqv: <http://www.w3.org/ns/dqv#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
-@prefix void1: <https://schema.org/void#> .
-@prefix xsd1: <https://schema.org/xsd#> .
+@prefix tags: <https://w3id.org/tags/vocab#> .
+@prefix void: <http://rdfs.org/ns/void#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<http://purls.helmholtz-metadaten.de/helmholtzkg/DBpedia-mini-samples-Berlin> a void1:Dataset ;
-    dcterms1:title "Topological Profile for DBpedia-mini-samples-Berlin"@en ;
-    void1:classPartition [ void1:class_ <http://www.wikidata.org/entity/Q486972> ;
-            void1:entities "1"^^xsd1:integer ],
-        [ void1:class_ <http://dbpedia.org/ontology/Place> ;
-            void1:entities "1"^^xsd1:integer ],
-        [ void1:class_ <http://dbpedia.org/ontology/PopulatedPlace> ;
-            void1:entities "1"^^xsd1:integer ],
-        [ void1:class_ <http://schema.org/Place> ;
-            void1:entities "1"^^xsd1:integer ],
-        [ void1:class_ <http://dbpedia.org/ontology/City> ;
-            void1:entities "1"^^xsd1:integer ],
-        [ void1:class_ <http://schema.org/City> ;
-            void1:entities "1"^^xsd1:integer ],
-        [ void1:class_ <http://www.wikidata.org/entity/Q515> ;
-            void1:entities "1"^^xsd1:integer ],
-        [ void1:class_ <http://dbpedia.org/ontology/Location> ;
-            void1:entities "1"^^xsd1:integer ],
-        [ void1:class_ <http://umbel.org/umbel/rc/PopulatedPlace> ;
-            void1:entities "1"^^xsd1:integer ],
-        [ void1:class_ <http://dbpedia.org/ontology/Settlement> ;
-            void1:entities "1"^^xsd1:integer ],
-        [ void1:class_ <http://umbel.org/umbel/rc/Location_Underspecified> ;
-            void1:entities "1"^^xsd1:integer ],
-        [ void1:class_ owl:Thing ;
-            void1:entities "1"^^xsd1:integer ],
-        [ void1:class_ <http://umbel.org/umbel/rc/City> ;
-            void1:entities "1"^^xsd1:integer ],
-        [ void1:class_ <http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing> ;
-            void1:entities "1"^^xsd1:integer ],
-        [ void1:class_ <http://umbel.org/umbel/rc/Village> ;
-            void1:entities "1"^^xsd1:integer ] ;
-    void1:classes "15"^^xsd1:integer ;
-    void1:distinctObjects "1777"^^xsd1:integer ;
-    void1:distinctSubjects "40335"^^xsd1:integer ;
-    void1:properties "484"^^xsd1:integer ;
-    void1:triples "53228"^^xsd1:integer .
+<http://purls.helmholtz-metadaten.de/helmholtzkg/DBpedia-mini-samples-Berlin> a void:Dataset ;
+    dcterms:modified "2026-11-11T13:55:13+00:00"^^xsd:dateTime ;
+    dcterms:title "Topological Profile for DBpedia-mini-samples-Berlin"@en ;
+    void:classPartition [ void:class <http://umbel.org/umbel/rc/Location_Underspecified> ;
+            void:entities 1 ],
+        [ void:class <http://umbel.org/umbel/rc/Village> ;
+            void:entities 1 ],
+        [ void:class <http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing> ;
+            void:entities 1 ],
+        [ void:class <http://dbpedia.org/ontology/City> ;
+            void:entities 1 ],
+        [ void:class <http://www.wikidata.org/entity/Q515> ;
+            void:entities 1 ],
+        [ void:class <http://www.wikidata.org/entity/Q486972> ;
+            void:entities 1 ],
+        [ void:class <http://dbpedia.org/ontology/Place> ;
+            void:entities 1 ],
+        [ void:class <http://umbel.org/umbel/rc/City> ;
+            void:entities 1 ],
+        [ void:class <http://umbel.org/umbel/rc/PopulatedPlace> ;
+            void:entities 1 ],
+        [ void:class <http://schema.org/Place> ;
+            void:entities 1 ],
+        [ void:class <http://dbpedia.org/ontology/Settlement> ;
+            void:entities 1 ],
+        [ void:class <http://dbpedia.org/ontology/Location> ;
+            void:entities 1 ],
+        [ void:class <http://dbpedia.org/ontology/PopulatedPlace> ;
+            void:entities 1 ],
+        [ void:class owl:Thing ;
+            void:entities 1 ],
+        [ void:class <http://schema.org/City> ;
+            void:entities 1 ] ;
+    void:classes 15 ;
+    void:distinctObjects 1777 ;
+    void:distinctSubjects 40335 ;
+    void:properties 484 ;
+    void:triples 53228 ;
+    dqv:hasQualityMeasurement [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/DBpedia-mini-samples-Berlin> ;
+            dqv:isMeasurementOf tags:M6 ;
+            dqv:value 4.853427e-05 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/DBpedia-mini-samples-Berlin> ;
+            dqv:isMeasurementOf tags:M13 ;
+            dqv:value 0 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/DBpedia-mini-samples-Berlin> ;
+            dqv:isMeasurementOf tags:M14 ;
+            dqv:value 1e+00 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/DBpedia-mini-samples-Berlin> ;
+            dqv:isMeasurementOf tags:M15 ;
+            dqv:value 4.918157e-03 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/DBpedia-mini-samples-Berlin> ;
+            dqv:isMeasurementOf tags:M8 ;
+            dqv:value 0e+00 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/DBpedia-mini-samples-Berlin> ;
+            dqv:isMeasurementOf tags:M1 ;
+            dqv:value 53228 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/DBpedia-mini-samples-Berlin> ;
+            dqv:isMeasurementOf tags:M12 ;
+            dqv:value 0 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/DBpedia-mini-samples-Berlin> ;
+            dqv:isMeasurementOf tags:M2 ;
+            dqv:value 41208 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/DBpedia-mini-samples-Berlin> ;
+            dqv:isMeasurementOf tags:M11 ;
+            dqv:value 1 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/DBpedia-mini-samples-Berlin> ;
+            dqv:isMeasurementOf tags:M3 ;
+            dqv:value 41207 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/DBpedia-mini-samples-Berlin> ;
+            dqv:isMeasurementOf tags:M5 ;
+            dqv:value 1.999951e+00 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/DBpedia-mini-samples-Berlin> ;
+            dqv:isMeasurementOf tags:M4 ;
+            dqv:value 15 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/DBpedia-mini-samples-Berlin> ;
+            dqv:isMeasurementOf tags:M10 ;
+            dqv:value 2.0604e+04 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/DBpedia-mini-samples-Berlin> ;
+            dqv:isMeasurementOf tags:M9 ;
+            dqv:value 0e+00 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/DBpedia-mini-samples-Berlin> ;
+            dqv:isMeasurementOf tags:M16 ;
+            dqv:value 3.906891e+00 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/DBpedia-mini-samples-Berlin> ;
+            dqv:isMeasurementOf tags:M7 ;
+            dqv:value 2.747133e+03 ] ;
+    tags:weakIslandThreshold 2 .
 

@@ -6,159 +6,181 @@
 
 # TAGS: Topological Analysis of Graph Structure
 
-TAGS is a two-pass graph profiling framework that integrates **16 topological and semantic metrics** (combining standard network-science quantities with specialized RDF) to measure structural graph quality by isolating instance-level topologies from taxonomic metadata.
+TAGS is a two-pass graph profiling framework that computes **16 topological and semantic metrics** (combining standard network-science measures with RDF-specific quality indicators) on the instance-level structure of an RDF graph, after separating it from the taxonomic (`rdf:type`) layer.
 
-Unlike standard network profilers that treat all RDF triples as structural edges—leading to "semantic inflation", TAGS isolates pure relational instance data to calculate meaningful topological metrics for quality assurance, index tuning, and database optimization.
+Profilers that treat every RDF triple as a graph edge let class nodes act as artificial hubs ("semantic inflation"). TAGS keeps the taxonomic layer out of the structural graph, so the topological metrics describe how instances are actually connected.
 
 ---
-
-## Key Features
 
 ## Features
 
-- **Two-Pass Algorithmic Decoupling**: isolates ontological schema layers from raw instance connections, ensuring completely accurate graph metrics without metadata path distortion.
-- **High-Performance Processing**: optimized in-memory data structures and localized neighborhood traversals, entirely eliminating heavy, external graph framework overhead.
-- **Comprehensive Metric Taxonomy**: calculates 16 core structural parameters ($M_1 \text{--} M_{16}$), tracking local sub-clique densities, centralities, and component topologies.
-- **Semantic Quality Diagnostics**: measures abstract network health properties, such as Class Imbalance Shannon Entropy and Type-Only Orphan Node counts.
-- **Triplestore Optimization Insights**: computes actionable topological indicators—like Degree Centrality Polarization—to drive database query planning, index selection, and subgraph caching strategies.
-- **VoID Metadata Export**: serializes analytical profiles into standardized W3C VoID metadata for instant machine discovery.
-- **Production-Ready CI/CD Validation**: features an integrated test suite checking against a mathematically derived ground-truth baseline.
+- **Two-pass taxonomic isolation**: pass 1 identifies schema classes (objects of `rdf:type`); pass 2 builds the instance-level structural graph without them.
+- **Explicit projection rules**: the structural graph is a simple undirected graph over instance nodes. Literals are excluded, parallel and inverse links between the same pair of nodes are collapsed into one edge, and self-loops are ignored.
+- **16 metrics** ($M_1$–$M_{16}$) for size, connectivity, clustering, fragmentation, and vocabulary usage (see the table below).
+- **Machine-actionable profiles**: standard statistics as W3C VoID properties, and all 16 metrics as W3C DQV quality measurements, described by the TAGS metric vocabulary ([`vocab/tags_vocab.ttl`](vocab/tags_vocab.ttl)).
+- **HTML dashboard** with a predicate co-occurrence matrix and class distribution plot.
+- **Tested**: the test suite checks all 16 metrics against the hand-derived values for the reference graph $G_{ref}$ and covers 13 edge cases.
 
 ---
 
-## Metric Taxonomy Summary
+## Metric Summary
 
-| Metric ID | Metric Name                          | Theoretical Range                | Diagnostic Interpretation                                      |
-| :-------- | :----------------------------------- | :------------------------------- | :------------------------------------------------------------- |
-| **M1**    | Total Asserted Triples               | $[0, \infty)$                    | Dataset scale validation                                       |
-| **M2**    | Unique Entity Nodes                  | $[0, \infty)$                    | Distinct instance node population                              |
-| **M3**    | Structural Object Links              | $[0, \infty)$                    | Relational instance graph edge volume                          |
-| **M4**    | Taxonomic Type Assertions            | $[0, \infty)$                    | Ontological class assignment count (`rdf:type`)                |
-| **M5**    | Average Node Connection              | $[0, \vert{}V\vert{}-1]$         | Mean node connectivity degree                                  |
-| **M6**    | Graph Density Factor                 | $[0, 1]$                         | Graph density vs. complete graph limit                         |
-| **M7**    | Structural-to-Semantic Ratio         | $[0, \infty)$                    | Proportion of instance links relative to class assertions      |
-| **M8**    | Maximum Local Clustering Coefficient | $[0, 1]$                         | Peak localized neighborhood density (clique strength)          |
-| **M9**    | Average Clustering Coefficient       | $[0, 1]$                         | Mean localized clustering across instance nodes                |
-| **M10**   | Degree Centrality Polarization       | $[1, \infty)$                    | Degree distribution centralization and hub detection           |
-| **M11**   | Total Disconnected Components        | $[1, \vert{}V\vert{}]$           | Graph partition and fragmentation count                        |
-| **M12**   | Type-Only Orphan Count               | $[0, \vert{}V\vert{}]$           | Nodes with class assertions but zero structural links          |
-| **M13**   | Prunable Weak Islands Count          | $[0, N_{\text{comp}}]$           | Isolated subgraphs containing $\le 2$ nodes                    |
-| **M14**   | Maximum Component Dominance Ratio    | $[\frac{1}{\vert{}V\vert{}}, 1]$ | Size ratio of the primary Giant Connected Component (GCC)      |
-| **M15**   | Dynamic Predicate Diversity Factor   | $[0, 1]$                         | Descriptive richness of object property predicates             |
-| **M16**   | Class Imbalance Entropy              | $[0, \log_2 \vert{}C\vert{}]$    | Shannon entropy of instance distribution across schema classes |
+| ID      | Metric                               | Range                                      | Definition                                                                   |
+| :------ | :----------------------------------- | :----------------------------------------- | :--------------------------------------------------------------------------- |
+| **M1**  | Total Asserted Triples               | $[0, \infty)$                              | Number of triples                                                            |
+| **M2**  | Unique Entity Nodes                  | $[0, \infty)$                              | Instance nodes (IRIs and blank nodes, excluding schema classes and literals) |
+| **M3**  | Structural Object Links              | $[0, \infty)$                              | Undirected instance-level edges (collapsed)                                  |
+| **M4**  | Taxonomic Type Assertions            | $[0, \infty)$                              | Number of `rdf:type` triples                                                 |
+| **M5**  | Average Node Connection              | $[0, \vert V\vert-1]$                      | $2\vert E\vert/\vert V\vert$                                                 |
+| **M6**  | Graph Density Factor                 | $[0, 1]$                                   | $2\vert E\vert/(\vert V\vert(\vert V\vert-1))$                               |
+| **M7**  | Structural-to-Semantic Ratio         | $[0, \infty)$                              | $M_3 / M_4$                                                                  |
+| **M8**  | Maximum Local Clustering Coefficient | $[0, 1]$                                   | Maximum local clustering coefficient                                         |
+| **M9**  | Average Clustering Coefficient       | $[0, 1]$                                   | Mean local clustering coefficient                                            |
+| **M10** | Degree Centrality Polarization       | $[1, \vert V\vert/2]$ for connected graphs | Maximum degree / average degree                                              |
+| **M11** | Total Disconnected Components        | $[1, \vert V\vert]$                        | Number of connected components                                               |
+| **M12** | Type-Only Orphan Count               | $[0, \vert V\vert]$                        | `rdf:type`-annotated instance nodes with no structural edge                  |
+| **M13** | Prunable Weak Islands Count          | $[0, M_{11}]$                              | Components with at most $\tau$ nodes (`--tau`, default 2)                    |
+| **M14** | Maximum Component Dominance Ratio    | $[1/\vert V\vert, 1]$                      | Share of instance nodes in the largest component                             |
+| **M15** | Dynamic Predicate Diversity Factor   | $[0, 1]$                                   | Distinct object properties / object-property triples                         |
+| **M16** | Class Imbalance Entropy              | $[0, \log_2 \vert C\vert]$                 | Shannon entropy of `rdf:type` assertions over classes                        |
+
+Instance nodes with no structural edge and no `rdf:type` are not counted in $M_{12}$; they are reported separately as a diagnostic.
 
 ---
 
-# Installation
+## Installation
 
-### Prerequisites
-
-- Python 3.8+
-- `pip` package manager
-- Virtual environment framework (`venv` or `conda`, recommended)
-
-### Core Dependencies
-
-The pipeline engine automatically manages or builds upon the following foundational semantic and analytical runtimes:
-
-- **`rdflib`**: For core W3C RDF parsing, graph manipulation, and Turtle serialization.
-- **`numpy`**: For optimized array indexing and matrix computation within topology loops.
-- **`matplotlib`** (Optional): For rendering high-impact matrix co-occurrence and class density visualizations in headless environments.
-
-### Install dependencies:
-
-We recommend using a virtual environment.
+Python 3.12 is recommended (the experiments in the paper used Python 3.12.3).
 
 ```bash
-	pip install -r requirements.txt
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
 ```
+
+`requirements.txt` pins the exact versions used (rdflib 7.0.0, psutil 5.9.5, NetworkX 2.8.8, ...). NetworkX is only needed for the Flat-NetworkX baseline; TAGS itself uses plain Python data structures.
 
 ---
 
-### Usage
+## Usage
 
-TAGS is designed as a command-line tool. Run the profiler by pointing it to your RDF file (.ttl, .rdf, .xml, .nt, .jsonld)).
+```bash
+python3 src/tags.py <rdf_file> [-o OUTPUT_DIR] [-f FORMAT] [--tau TAU] [--flat]
+```
 
-- **Default output:** By default, the pipeline automatically resolves an absolute path relative to the script location and safely routes all outputs directly to `../output/`:
+| Option               | Meaning                                                                                   |
+| :------------------- | :---------------------------------------------------------------------------------------- |
+| `-o`, `--output-dir` | Output folder (default: `output/` in the repository)                                      |
+| `-f`, `--format`     | RDF format (`turtle`, `nt`, `xml`, `json-ld`, ...); guessed from the extension if omitted |
+| `--tau`              | Threshold for prunable weak islands $M_{13}$ (default: 2)                                 |
+| `--flat`             | Ablation mode: keep `rdf:type` triples as edges (no taxonomic isolation)                  |
 
-  ```bash
-  python3 src/tags.py ./examples/hkg_sample_triples_9.ttl
+Example:
 
-  ```
-
-- **Custom Output:** To explicitly direct all generated payloads, visualizations, and summary files into a targeted storage destination, use the `-o` or `--output-dir` parameter:
-
-  ```bash
-  python3 src/tags.py ./examples/hkg_sample_triples_9.ttl -o ./custom_output/
-
-  ```
-
-- **Help Configuration Options:** To view the command-line interface helper configurations and flags, run:
-
-  ```bash
-  python3 tags.py --help
-  ```
+```bash
+python3 src/tags.py tests/test_baseline.ttl -o output/
+```
 
 ### Outputs
 
-Upon compilation, the TAGS engine writes three unified output layers to your chosen output directory:
+For an input `name.ttl`, TAGS writes to the output folder:
 
-- Terminal Dashboard: A structurally aligned terminal printout mapping out calculated values for all 16 indicators alongside top discovered high-degree topological hubs.
+- `name_void.ttl`: VoID profile with standard statistics (`void:triples`, `void:classPartition`, ...) and all 16 metrics as `dqv:QualityMeasurement`s; the threshold $\tau$ is recorded as `tags:weakIslandThreshold`.
+- `tags_vocab.ttl`: the TAGS metric vocabulary (one `dqv:Metric` per metric).
+- `name_dashboard.html`: self-contained HTML dashboard.
 
-- W3C VoID Metadata (`*_void.ttl`): A fully compliant, machine-actionable Turtle semantic file indexing distinct nodes, subject/object properties, and sub-class partitions for catalog ingestion.
+The 16 metrics are also printed in the terminal, together with the top hubs and diagnostics (untyped isolated nodes, ignored self-loops).
 
-- Visual Analytics Dashboard (`*_dashboard.html`): A responsive, self-contained HTML report embedding Base64-encoded visual frameworks, including the Dynamic Predicate Co-occurrence Matrix and Taxonomic Class Density Profiles.
+---
 
-## Testing & Quality Assurance
-
-This project utilizes `pytest` to ensure structural analysis metrics remain consistent across updates. We maintain a CI/CD pipeline using GitHub Actions to validate code integrity on every push automatically.
-
-```bash
-pip install pytest
-python3 -m pytest
-```
-
-The test suite validates the core `analyze_knowledge_graph` logic against a synthetic graph to ensure parsing accuracy and stability of metric computation. The following figure shows the results of the baseline test graph.
-
-### Running Tests Locally
-
-We recommend running tests before submitting changes to ensure local logic parity. Ensure you have installed the development dependencies:
+## Testing
 
 ```bash
-pip install -r requirements.txt
-python3 -m pytest
+python3 -m pytest tests
 ```
 
-The test suite validates the core analyze_knowledge_graph logic against a synthetic graph to ensure parsing accuracy and stability of metric computation.
+The suite checks all 16 metrics on $G_{ref}$ (`tests/test_baseline.ttl`) within $\varepsilon = 10^{-5}$, the projection example from the paper (`tests/projection_example.ttl`), the 13 edge-case graphs in `tests/edge-Case-validation/`, and the VoID/DQV export. It runs on every push via GitHub Actions.
 
-### Empirical Large-Scale Validation (Berlin Use Case)
+---
 
-To demonstrate the computational viability and structural diagnostic utility of TAGS on production-scale data, the engine was stress-tested against a dense, highly centralized real-world knowledge graph asset centered on the city of Berlin harvested from DBpedia ([DBpedia-mini-samples-Berlin.ttl](http://dbpedia.org/data/Berlin.ttl)).
+## Reproducing the Results of the Paper
+
+All commands are run from the repository root after installation. Timing results depend on hardware; the paper's measurements were taken on an Intel Core Ultra 5 225U (14 logical cores), 32 GB RAM, 1 TB NVMe SSD, Ubuntu 24.04.5 LTS, Python 3.12.3.
+
+**1. Datasets**
 
 ```bash
-python3 src/run_scale_test.py ../examples/Large-scale-data/DBpedia-mini-samples-Berlin.ttl
+python3 scripts/fetch_datasets.py
 ```
 
-The framework successfully executed the entire 16-metric extraction matrix on standard commodity hardware with the following resource profiles:
+$G_{ref}$ and the edge cases are in `tests/`; the DBpedia Berlin sample (the Linked Data description of `dbr:Berlin`) is bundled in `examples/`. The script downloads the ORKG N-Triples dump into `data/` and verifies all files against `data/CHECKSUMS.sha256`. ORKG dumps are not versioned, so a newer dump will not match the checksum of the snapshot used in the paper (retrieved 2026-09-07). No preprocessing is applied to any dataset.
 
-| Evaluation Attribute                   | Empirical Value |
-| -------------------------------------- | --------------- |
-| Total Asserted Triples (M1​)           | 53,228 triples  |
-| Unique Entity Nodes (M2​)              | 40,335 vertices |
-| Structural Object Links (M3​)          | 41,677 links    |
-| Average Node Connection (M5​)          | 2.06654         |
-| Degree Centrality Heterogeneity (M10​) | 20,167.50       |
-| Total Processing Time                  | 125.61 seconds  |
-| Peak RAM Consumption                   | 130.34 MB       |
+**2. Metric validation (validation table, edge cases)**
 
-The evaluation empirically confirmed an extreme power-law star topology ($M_{10} = 20,167.50$), accurately isolating <http://dbpedia.org/resource/Berlin> as the absolute primary hub with a degree of 41,677, while secondary entity nodes maintained a connection degree of exactly 1. Because secondary entities form no peripheral multi-hop neighborhoods—mathematically captured by an Average Clustering Coefficient ($M_9$) of exactly 0.00—the framework successfully maps dense semantic footprints without hitting exponential processing bounds.
+```bash
+python3 -m pytest tests
+python3 src/tags.py tests/test_baseline.ttl -o output/
+```
 
-### Citation
+**3. Synthetic scalability benchmark (measured and extrapolated tables, scalability figure)**
 
-If you use TAGS in your research, please cite our paper:
+```bash
+python3 benchmarks/benchmark.py synthetic --sizes 1000 10000 100000 1000000 --runs 5
+```
 
-TBD.
+Generates chain-like synthetic graphs (fixed seed 42), runs TAGS five times per size in separate processes, and reports mean time, SD, 95% confidence interval, peak RSS delta, the linear and log-log fits, extrapolations to 5M–50M triples, and `results/tags_scalability.png`. Raw per-run values are saved in `results/`.
 
-### License
+**4. DBpedia Berlin and ORKG profiles and runtime**
 
-Distributed under the MIT License. See the `LICENSE` file in the root directory for more information.
+```bash
+python3 src/tags.py examples/DBpedia-mini-samples-Berlin.ttl -o output/
+python3 benchmarks/benchmark.py file examples/DBpedia-mini-samples-Berlin.ttl --runs 5
+
+python3 src/tags.py data/rdf-export-orkg.nt -f nt -o output/
+python3 benchmarks/benchmark.py file data/rdf-export-orkg.nt -f nt --runs 5
+```
+
+**5. Sensitivity of $M_{13}$ to $\tau$**
+
+```bash
+python3 benchmarks/tau_sensitivity.py data/rdf-export-orkg.nt -f nt --taus 1 2 3 5 10 20
+```
+
+**6. Flat-NetworkX baseline and taxonomic-isolation ablation**
+
+```bash
+python3 benchmarks/flat_networkx_baseline.py tests/test_baseline.ttl
+python3 benchmarks/flat_networkx_baseline.py examples/kg-sample_triples_3171.ttl --runs 5
+```
+
+Compares a single-pass NetworkX graph with `rdf:type` edges, the same graph after post-hoc removal of `rdf:type` edges, and TAGS.
+
+---
+
+## Example: DBpedia Berlin Sample
+
+```bash
+python3 src/tags.py examples/DBpedia-mini-samples-Berlin.ttl
+```
+
+| Metric                                    | Value   |
+| :---------------------------------------- | :------ |
+| Total Asserted Triples ($M_1$)            | 53,228  |
+| Unique Entity Nodes ($M_2$)               | 41,208  |
+| Structural Object Links ($M_3$)           | 41,207  |
+| Taxonomic Type Assertions ($M_4$)         | 15      |
+| Average Node Connection ($M_5$)           | 1.99995 |
+| Degree Centrality Polarization ($M_{10}$) | 20,604  |
+| Total Disconnected Components ($M_{11}$)  | 1       |
+
+The file describes a single resource, so almost every triple has `dbr:Berlin` as subject or object: the structural graph is a star with `dbr:Berlin` as hub (degree 41,207) and $M_{10} = |V|/2$, the maximum for a connected graph. One self-loop is ignored.
+
+---
+
+## Citation
+
+If you use TAGS in your research, please cite our paper (TBD) or the software via `CITATION.cff`.
+
+## License
+
+Code: MIT License (see `LICENSE`). The ORKG data is published under CC0 1.0 (Papers With Code–derived parts under CC BY-SA); DBpedia data under CC BY-SA 3.0 and GFDL.

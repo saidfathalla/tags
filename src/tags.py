@@ -11,7 +11,7 @@ import math
 import io
 import base64
 import argparse
-from collections import defaultdict, Counter
+from collections import defaultdict, Counter, deque
 
 # 1. Secure Dependency Imports
 try:
@@ -40,10 +40,29 @@ DQV = Namespace("http://www.w3.org/ns/dqv#")
 TAGS = Namespace("https://w3id.org/tags/vocab#")
 
 
-def analyze_knowledge_graph(ttl_file, file_format=None):
+def analyze_knowledge_graph(ttl_file, file_format=None, tau=2, isolate_taxonomy=True):
     """
-    Parses an RDF graph via RDFLib to calculate semantic and topological analytics.
-    Exposes structural counts for Data Properties, Object Properties, and Schema Classes.
+    Parses an RDF graph via RDFLib and computes the sixteen TAGS metrics.
+
+    Parameters
+    ----------
+    ttl_file : str
+        Path to the RDF file.
+    file_format : str, optional
+        RDF serialization (e.g., 'turtle', 'nt'); guessed from the extension if omitted.
+    tau : int
+        Node-count threshold for prunable weak islands (M13): components with
+        at most `tau` nodes are counted.
+    isolate_taxonomy : bool
+        True (default): TAGS projection -- rdf:type triples and schema-class
+        nodes are excluded from the structural graph.
+        False: flat projection used for the ablation study -- rdf:type triples
+        are treated as ordinary edges and class nodes as ordinary vertices.
+
+    Projection rules (TAGS mode): the structural graph is a simple undirected
+    graph over instance nodes (IRIs and blank nodes that are not schema
+    classes). Literals are excluded, parallel and inverse links between the
+    same pair of nodes are collapsed into one edge, and self-loops are ignored.
     """
     g = rdflib.Graph(bind_namespaces="none")
     try:
@@ -83,53 +102,71 @@ def analyze_knowledge_graph(ttl_file, file_format=None):
     subjects = set()
     predicates = set()
     objects = set()
-    classes = defaultdict(int)
-    
+    classes = defaultdict(int)          # class -> number of rdf:type assertions
+    typed_nodes = set()                 # subjects of at least one rdf:type triple
+
     object_properties = set()
     data_properties = set()
-    
+
     taxonomic_triples = 0
     structural_edges = set()
     adj = defaultdict(set)
     predicate_by_subject = defaultdict(set)
-    instance_predicates = set()
-    
+    self_loops = 0
+    object_triples = 0                  # non-rdf:type triples with an IRI/blank-node object
+
     instance_nodes = set()
     schema_classes = set()
 
-    # Pass 1: Identify schema classes first
+    def nid(t):
+        return f"_:{t}" if isinstance(t, rdflib.BNode) else str(t)
+
+    # Pass 1: identify schema classes (objects of rdf:type)
     for s, p, o in g:
         if p == RDF.type:
             schema_classes.add(o)
+    if not isolate_taxonomy:
+        schema_classes = set()          # flat mode: classes are ordinary nodes
 
-# Pass 2: Extract instance entities and structural connections
+    def is_instance(t):
+        return isinstance(t, (URIRef, rdflib.BNode)) and t not in schema_classes
+
+    # Pass 2: extract instance entities and structural connections
     for s, p, o in g:
         subjects.add(s)
         predicates.add(p)
         objects.add(o)
-        
-        s_str = f"_:{s}" if isinstance(s, rdflib.BNode) else str(s)
-        o_str = f"_:{o}" if isinstance(o, rdflib.BNode) else str(o)
+        s_str, o_str = nid(s), nid(o)
 
-        if s not in schema_classes:
+        if is_instance(s):
             instance_nodes.add(s_str)
-            
+
         if p == RDF.type:
             taxonomic_triples += 1
             classes[o] += 1
-        else:
-            if isinstance(o, (URIRef, rdflib.BNode)):
-                if o not in schema_classes:
-                    instance_nodes.add(o_str)
-                object_properties.add(p)
-                structural_edges.add(tuple(sorted([s_str, o_str])))
-                adj[s_str].add(o_str)
-                adj[o_str].add(s_str)
-            elif isinstance(o, rdflib.Literal):
-                data_properties.add(p)
-            
-            instance_predicates.add(p)
+            typed_nodes.add(s_str)
+            if isolate_taxonomy:
+                continue                # taxonomic layer kept out-of-band
+        if isinstance(o, rdflib.Literal):
+            data_properties.add(p)
             predicate_by_subject[s_str].add(str(p))
+            continue
+
+        # object is an IRI or blank node
+        if is_instance(o):
+            instance_nodes.add(o_str)
+        if p != RDF.type:
+            object_properties.add(p)
+            object_triples += 1
+            predicate_by_subject[s_str].add(str(p))
+        if not (is_instance(s) and is_instance(o)):
+            continue                    # edges to/from schema classes are not instance links
+        if s_str == o_str:
+            self_loops += 1             # simple graph: self-loops ignored
+            continue
+        structural_edges.add((s_str, o_str) if s_str < o_str else (o_str, s_str))
+        adj[s_str].add(o_str)
+        adj[o_str].add(s_str)
 
     # Metric Calculations
     M2 = len(instance_nodes)
@@ -143,72 +180,62 @@ def analyze_knowledge_graph(ttl_file, file_format=None):
     # Local & Average Clustering Coefficient (M8 / M9)
     local_cluster_coeffs = {}
     for node in instance_nodes:
-        neighbors = adj[node]
+        neighbors = adj.get(node, set())
         k_i = len(neighbors)
         if k_i < 2:
             local_cluster_coeffs[node] = 0.0
             continue
-        
         e_i = 0
         neighbors_list = list(neighbors)
-        for i in range(len(neighbors_list)):
-            for j in range(i + 1, len(neighbors_list)):
-                if neighbors_list[j] in adj.get(neighbors_list[i], set()):
+        for i in range(k_i):
+            nbrs_i = adj.get(neighbors_list[i], set())
+            for j in range(i + 1, k_i):
+                if neighbors_list[j] in nbrs_i:
                     e_i += 1
         local_cluster_coeffs[node] = (2.0 * e_i) / (k_i * (k_i - 1))
 
-    # Local Clustering Statistics
     coeffs_list = list(local_cluster_coeffs.values()) if local_cluster_coeffs else [0.0]
+    M8 = float(np.max(coeffs_list))     # M8: maximum local clustering coefficient
+    M9 = float(np.mean(coeffs_list))    # M9: average local clustering coefficient
 
-    # M8: Maximum Local Clustering Coefficient
-    M8 = float(np.max(coeffs_list)) if coeffs_list else 0.0
-
-    # M9: Average Local Clustering Coefficient (\bar{C})
-    M9 = float(np.mean(coeffs_list)) if coeffs_list else 0.0  
-
-    
-    # M10: Degree Centrality Heterogeneity / Polarization
-    degrees = [len(adj[n]) for n in instance_nodes]
+    # M10: Degree Centrality Polarization = max degree / average degree
+    degrees = [len(adj.get(n, ())) for n in instance_nodes]
     delta_G = max(degrees) if degrees else 0
     M10 = (float(delta_G) / M5) if M5 > 0 else 0.0
 
-    # M11: Disconnected Components Discovery (BFS)
+    # M11: connected components (BFS)
     visited = set()
     components = []
-    
     for node in instance_nodes:
-        if node not in visited:
-            comp = []
-            queue = [node]
-            visited.add(node)
-            while queue:
-                curr = queue.pop(0)
-                comp.append(curr)
-                for nbr in list(adj.get(curr, set())):
-                    if nbr not in visited:
-                        visited.add(nbr)
-                        queue.append(nbr)
-            components.append(comp)
-
+        if node in visited:
+            continue
+        comp = []
+        queue = deque([node])
+        visited.add(node)
+        while queue:
+            curr = queue.popleft()
+            comp.append(curr)
+            for nbr in adj.get(curr, ()):
+                if nbr not in visited:
+                    visited.add(nbr)
+                    queue.append(nbr)
+        components.append(comp)
     M11 = len(components)
-    
-    # M14: Giant Connected Component Dominance (restricted to instance nodes)
-    if components and M2 > 0:
-        max_instance_comp_size = max(
-            sum(1 for node in comp if node in instance_nodes) 
-            for comp in components
-        )
-        M14 = float(max_instance_comp_size) / M2
-    else:
-        M14 = 0.0
-    # M12: Type-Only Orphans (Degree == 0)
-    M12 = sum(1 for n in instance_nodes if len(adj[n]) == 0)
+    component_sizes = sorted((len(c) for c in components), reverse=True)
 
-    # M13: Weak Islands (Components with <= 2 nodes)
-    M13 = sum(1 for comp in components if len(comp) <= 2)
+    # M14: largest connected component dominance
+    M14 = (float(component_sizes[0]) / M2) if components and M2 > 0 else 0.0
+
+    # M12: type-only orphans = typed instance nodes with no structural edge
+    isolated = [n for n in instance_nodes if not adj.get(n)]
+    M12 = sum(1 for n in isolated if n in typed_nodes)
+    untyped_isolated = len(isolated) - M12     # reported separately, not part of M12
+
+    # M13: prunable weak islands = components with at most tau nodes
+    M13 = sum(1 for size in component_sizes if size <= tau)
 
     # M15: Dynamic Predicate Diversity Factor (normalized ratio)
-    M15 = float(len(object_properties)) / M3 if M3 > 0 else 0.0
+    M15 = float(len(object_properties)) / object_triples if object_triples > 0 else 0.0
 
     # M16: Taxonomic Class Assignment Entropy
     total_types = sum(classes.values())
@@ -218,7 +245,7 @@ def analyze_knowledge_graph(ttl_file, file_format=None):
             p_c = float(count) / total_types
             M16 -= p_c * math.log2(p_c)
 
-    sorted_hubs = sorted(adj.items(), key=lambda x: len(x[1]), reverse=True)[:5]
+    sorted_hubs = sorted(((n, adj.get(n, set())) for n in instance_nodes), key=lambda x: len(x[1]), reverse=True)[:5]
 
     return {
         "raw_counts": {"triples": M1, "subjects": len(subjects), "properties": len(predicates), "objects": len(objects), "classes": len(classes)},
@@ -239,13 +266,16 @@ def analyze_knowledge_graph(ttl_file, file_format=None):
             "M9": [M9, "Average Clustering Coefficient", "Mean local clustering coefficient over instance nodes."],
             "M10": [M10, "Degree Centrality Polarization", "Ratio of the maximum degree to the average degree (M5)."],
             "M11": [M11, "Total Disconnected Components", "Number of connected components of the instance-level graph."],
-            "M12": [M12, "Type-Only Orphan Count", "Number of instance nodes with no incident instance-level edge."],
-            "M13": [M13, "Prunable Weak Islands Count", "Number of connected components with at most two nodes."],
+            "M12": [M12, "Type-Only Orphan Count", "Number of rdf:type-annotated instance nodes with no incident instance-level edge."],
+            "M13": [M13, "Prunable Weak Islands Count", "Number of connected components with at most tau nodes; tau is recorded in the profile as tags:weakIslandThreshold."],
             "M14": [M14, "Maximum Component Dominance Ratio", "Fraction of instance nodes in the largest connected component."],
-            "M15": [M15, "Dynamic Predicate Diversity Factor", "Number of distinct object properties divided by the number of instance-level edges (M3)."],
+            "M15": [M15, "Dynamic Predicate Diversity Factor", "Number of distinct object properties divided by the number of object-property triples (before edge collapsing); range [0, 1]."],
             "M16": [M16, "Class Imbalance Entropy", "Shannon entropy (base 2) of the distribution of rdf:type assertions over classes."]
         },
         "hubs": sorted_hubs,
+        "diagnostics": {"untyped_isolated_nodes": untyped_isolated, "self_loops_ignored": self_loops,
+                        "tau": tau, "isolate_taxonomy": isolate_taxonomy},
+        "component_sizes": component_sizes,
         "classes": classes,
         "predicates": predicates,
         "pred_by_sub": predicate_by_subject
@@ -263,6 +293,10 @@ def export_metric_vocabulary(results, output_dir):
         vg.add((m, RDF.type, DQV.Metric))
         vg.add((m, RDFS.label, Literal(f"{code}: {name}", lang="en")))
         vg.add((m, RDFS.comment, Literal(desc, lang="en")))
+    vg.add((TAGS.weakIslandThreshold, RDF.type, RDF.Property))
+    vg.add((TAGS.weakIslandThreshold, RDFS.label, Literal("weak island threshold (tau)", lang="en")))
+    vg.add((TAGS.weakIslandThreshold, RDFS.comment,
+            Literal("Node-count threshold tau used to compute M13 in this profile.", lang="en")))
     path = os.path.join(output_dir, "tags_vocab.ttl")
     vg.serialize(destination=path, format="turtle")
     return path
@@ -286,6 +320,8 @@ def export_void_statistics(results, base_name, output_dir):
     dataset_uri = URIRef(f"http://purls.helmholtz-metadaten.de/helmholtzkg/{base_name}")
     void_g.add((dataset_uri, RDF.type, VOID.Dataset))
     void_g.add((dataset_uri, DCTERMS.title, Literal(f"Topological Profile for {base_name}", lang="en")))
+    void_g.add((dataset_uri, TAGS.weakIslandThreshold,
+                Literal(results["diagnostics"]["tau"], datatype=XSD.integer)))
     void_g.add((dataset_uri, DCTERMS.modified,
                 Literal(datetime.now(timezone.utc).isoformat(timespec="seconds"), datatype=XSD.dateTime)))
     void_g.add((dataset_uri, VOID.triples, Literal(results['raw_counts']['triples'], datatype=XSD.integer)))
@@ -404,6 +440,9 @@ def display_terminal_dashboard(results, base_name):
     for i, (hub, neighbors) in enumerate(results['hubs'], 1):
         trunc_hub = hub if len(hub) <= 48 else hub[:45] + "..."
         print(f" │ Rank [{i:02d}]  Degree: {len(neighbors):<4}  URI: <{trunc_hub:<48}>")
+    d = results.get("diagnostics", {})
+    print(f" │ Diagnostics: tau = {d.get('tau')}, taxonomic isolation = {d.get('isolate_taxonomy')}, "
+          f"untyped isolated nodes = {d.get('untyped_isolated_nodes')}, self-loops ignored = {d.get('self_loops_ignored')}")
     print("═" * (border_width + 2) + "\n")
 
 
@@ -431,6 +470,8 @@ def main():
     parser.add_argument("ttl_file", help="Path to targeted RDF graph file.")
     parser.add_argument("-o", "--output-dir", default=None, help="Target output directory folder path.")
     parser.add_argument("-f", "--format", default=None, help="RDF serialization format specification (e.g., turtle, xml, json-ld, nt). Auto-guessed if omitted.")
+    parser.add_argument("--tau", type=int, default=2, help="Node-count threshold for prunable weak islands (M13). Default: 2.")
+    parser.add_argument("--flat", action="store_true", help="Ablation mode: keep rdf:type triples as edges (no taxonomic isolation).")
     args = parser.parse_args()
     
     if not os.path.exists(args.ttl_file):
@@ -446,9 +487,12 @@ def main():
     os.makedirs(target_dir, exist_ok=True)
     source_name = os.path.basename(args.ttl_file)          # e.g., test_baseline.ttl
     base_name = os.path.splitext(source_name)[0]            # e.g., test_baseline
+    if args.flat:
+        base_name += "_flat"
     
     print(f"[System Execution] Commencing programmatic parsing of structural schema graph...")
-    results = analyze_knowledge_graph(args.ttl_file, file_format=args.format)
+    results = analyze_knowledge_graph(args.ttl_file, file_format=args.format,
+                                      tau=args.tau, isolate_taxonomy=not args.flat)
     if not results or "error" in results:
         print(f"[System Stop] Execution aborted due to malformed RDF syntax in '{args.ttl_file}'.")
         print(f"[System Stop] Please provide a VALID RDF file.")

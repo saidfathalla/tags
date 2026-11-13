@@ -1,0 +1,85 @@
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix dqv: <http://www.w3.org/ns/dqv#> .
+@prefix schema: <https://schema.org/> .
+@prefix tags: <https://w3id.org/tags/vocab#> .
+@prefix void: <http://rdfs.org/ns/void#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://purls.helmholtz-metadaten.de/helmholtzkg/multiple_OP> a void:Dataset ;
+    dcterms:modified "2026-11-11T12:55:21+00:00"^^xsd:dateTime ;
+    dcterms:title "Topological Profile for multiple_OP"@en ;
+    void:classPartition [ void:class schema:Student ;
+            void:entities 1 ],
+        [ void:class schema:Person ;
+            void:entities 1 ] ;
+    void:classes 2 ;
+    void:distinctObjects 3 ;
+    void:distinctSubjects 1 ;
+    void:properties 3 ;
+    void:triples 4 ;
+    dqv:hasQualityMeasurement [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/multiple_OP> ;
+            dqv:isMeasurementOf tags:M15 ;
+            dqv:value 1e+00 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/multiple_OP> ;
+            dqv:isMeasurementOf tags:M1 ;
+            dqv:value 4 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/multiple_OP> ;
+            dqv:isMeasurementOf tags:M14 ;
+            dqv:value 1e+00 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/multiple_OP> ;
+            dqv:isMeasurementOf tags:M3 ;
+            dqv:value 1 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/multiple_OP> ;
+            dqv:isMeasurementOf tags:M11 ;
+            dqv:value 1 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/multiple_OP> ;
+            dqv:isMeasurementOf tags:M12 ;
+            dqv:value 0 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/multiple_OP> ;
+            dqv:isMeasurementOf tags:M8 ;
+            dqv:value 0e+00 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/multiple_OP> ;
+            dqv:isMeasurementOf tags:M4 ;
+            dqv:value 2 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/multiple_OP> ;
+            dqv:isMeasurementOf tags:M9 ;
+            dqv:value 0e+00 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/multiple_OP> ;
+            dqv:isMeasurementOf tags:M16 ;
+            dqv:value 1e+00 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/multiple_OP> ;
+            dqv:isMeasurementOf tags:M6 ;
+            dqv:value 1e+00 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/multiple_OP> ;
+            dqv:isMeasurementOf tags:M5 ;
+            dqv:value 1e+00 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/multiple_OP> ;
+            dqv:isMeasurementOf tags:M7 ;
+            dqv:value 5e-01 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/multiple_OP> ;
+            dqv:isMeasurementOf tags:M13 ;
+            dqv:value 1 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/multiple_OP> ;
+            dqv:isMeasurementOf tags:M10 ;
+            dqv:value 1e+00 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/multiple_OP> ;
+            dqv:isMeasurementOf tags:M2 ;
+            dqv:value 2 ] ;
+    tags:weakIslandThreshold 2 .
+
