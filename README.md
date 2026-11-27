@@ -65,7 +65,7 @@ pip install -r requirements.txt
 ## Usage
 
 ```bash
-python3 src/tags.py <rdf_file> [-o OUTPUT_DIR] [-f FORMAT] [--tau TAU] [--flat]
+python3 src/tags.py <rdf_file> [-o OUTPUT_DIR] [-f FORMAT] [--tau TAU] [--flat] [--base-iri IRI]
 ```
 
 | Option               | Meaning                                                                                   |
@@ -74,6 +74,7 @@ python3 src/tags.py <rdf_file> [-o OUTPUT_DIR] [-f FORMAT] [--tau TAU] [--flat]
 | `-f`, `--format`     | RDF format (`turtle`, `nt`, `xml`, `json-ld`, ...); guessed from the extension if omitted |
 | `--tau`              | Threshold for prunable weak islands $M_{13}$ (default: 2)                                 |
 | `--flat`             | Ablation mode: keep `rdf:type` triples as edges (no taxonomic isolation)                  |
+| `--base-iri`         | Namespace for the dataset IRI in the VoID profile (default: `http://example.org/tags/dataset/`) |
 
 Example:
 
@@ -126,9 +127,11 @@ python3 src/tags.py tests/test_baseline.ttl -o output/
 
 ```bash
 python3 benchmarks/benchmark.py synthetic --sizes 1000 10000 100000 1000000 --runs 5
+python3 benchmarks/benchmark.py synthetic --topology scale-free --sizes 1000 10000 100000 1000000 --runs 5
+python3 benchmarks/benchmark.py synthetic --topology clustered --sizes 1000 10000 100000 1000000 --runs 5 --keep-data
 ```
 
-Generates chain-like synthetic graphs (fixed seed 42), runs TAGS five times per size in separate processes, and reports mean time, SD, 95% confidence interval, peak RSS delta, the linear and log-log fits, extrapolations to 5M–50M triples, and `results/tags_scalability.png`. Raw per-run values are saved in `results/`.
+Generates synthetic graphs with a fixed seed (42), runs TAGS five times per size in separate processes, and reports mean time, SD, 95% confidence interval, peak RSS delta, the linear and log-log fits, extrapolations to 5M–50M triples, and a scalability plot. Three topologies are available: `chain` (default; chains with low clustering), `scale-free` (Barabási–Albert preferential attachment, with hubs), and `clustered` (Holme–Kim model, with hubs and many triangles). Raw per-run values are saved in `results/` (`synthetic_*.csv` for chains, `synthetic_scale-free_*.csv` and `synthetic_clustered_*.csv` for the others).
 
 **4. DBpedia Berlin and ORKG profiles and runtime**
 
@@ -151,9 +154,11 @@ python3 benchmarks/tau_sensitivity.py data/rdf-export-orkg.nt -f nt --taus 1 2 3
 ```bash
 python3 benchmarks/flat_networkx_baseline.py tests/test_baseline.ttl
 python3 benchmarks/flat_networkx_baseline.py examples/kg-sample_triples_3171.ttl --runs 5
+python3 benchmarks/flat_networkx_baseline.py examples/DBpedia-mini-samples-Berlin.ttl --runs 5
+python3 benchmarks/flat_networkx_baseline.py results/synthetic_data/clustered_100000.nt -f nt --runs 5
 ```
 
-Compares a single-pass NetworkX graph with `rdf:type` edges, the same graph after post-hoc removal of `rdf:type` edges, and TAGS.
+Compares four ways of building the graph: a single-pass NetworkX graph with `rdf:type` edges (`flat`), the same graph after post-hoc removal of `rdf:type` edges (`posthoc`), a single-pass NetworkX graph that skips `rdf:type` triples while it is built (`construction`), and TAGS. For each it reports the metrics, the runtime (mean and SD) and the peak RSS delta. The last command needs the clustered graph generated in step 3 (`--keep-data`).
 
 ---
 

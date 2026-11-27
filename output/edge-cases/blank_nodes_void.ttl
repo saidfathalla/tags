@@ -5,12 +5,12 @@
 @prefix void: <http://rdfs.org/ns/void#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<http://purls.helmholtz-metadaten.de/helmholtzkg/blank_nodes> a void:Dataset ;
-    dcterms:modified "2026-11-11T12:55:18+00:00"^^xsd:dateTime ;
+<http://example.org/tags/dataset/blank_nodes> a void:Dataset ;
+    dcterms:modified "2026-11-27T10:27:51+00:00"^^xsd:dateTime ;
     dcterms:title "Topological Profile for blank_nodes"@en ;
-    void:classPartition [ void:class schema:Person ;
+    void:classPartition [ void:class schema:Dataset ;
             void:entities 1 ],
-        [ void:class schema:Dataset ;
+        [ void:class schema:Person ;
             void:entities 1 ],
         [ void:class schema:PostalAddress ;
             void:entities 1 ] ;
@@ -20,68 +20,68 @@
     void:properties 4 ;
     void:triples 6 ;
     dqv:hasQualityMeasurement [ a dqv:QualityMeasurement ;
-            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/blank_nodes> ;
-            dqv:isMeasurementOf tags:M15 ;
-            dqv:value 1e+00 ],
-        [ a dqv:QualityMeasurement ;
-            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/blank_nodes> ;
-            dqv:isMeasurementOf tags:M3 ;
-            dqv:value 2 ],
-        [ a dqv:QualityMeasurement ;
-            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/blank_nodes> ;
-            dqv:isMeasurementOf tags:M16 ;
-            dqv:value 1.584963e+00 ],
-        [ a dqv:QualityMeasurement ;
-            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/blank_nodes> ;
-            dqv:isMeasurementOf tags:M10 ;
-            dqv:value 1.5e+00 ],
-        [ a dqv:QualityMeasurement ;
-            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/blank_nodes> ;
-            dqv:isMeasurementOf tags:M11 ;
-            dqv:value 1 ],
-        [ a dqv:QualityMeasurement ;
-            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/blank_nodes> ;
-            dqv:isMeasurementOf tags:M2 ;
-            dqv:value 3 ],
-        [ a dqv:QualityMeasurement ;
-            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/blank_nodes> ;
-            dqv:isMeasurementOf tags:M1 ;
-            dqv:value 6 ],
-        [ a dqv:QualityMeasurement ;
-            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/blank_nodes> ;
-            dqv:isMeasurementOf tags:M5 ;
-            dqv:value 1.333333e+00 ],
-        [ a dqv:QualityMeasurement ;
-            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/blank_nodes> ;
-            dqv:isMeasurementOf tags:M6 ;
-            dqv:value 6.666667e-01 ],
-        [ a dqv:QualityMeasurement ;
-            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/blank_nodes> ;
-            dqv:isMeasurementOf tags:M13 ;
-            dqv:value 0 ],
-        [ a dqv:QualityMeasurement ;
-            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/blank_nodes> ;
-            dqv:isMeasurementOf tags:M14 ;
-            dqv:value 1e+00 ],
-        [ a dqv:QualityMeasurement ;
-            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/blank_nodes> ;
+            dqv:computedOn <http://example.org/tags/dataset/blank_nodes> ;
             dqv:isMeasurementOf tags:M7 ;
             dqv:value 6.666667e-01 ],
         [ a dqv:QualityMeasurement ;
-            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/blank_nodes> ;
-            dqv:isMeasurementOf tags:M9 ;
-            dqv:value 0e+00 ],
+            dqv:computedOn <http://example.org/tags/dataset/blank_nodes> ;
+            dqv:isMeasurementOf tags:M15 ;
+            dqv:value 1e+00 ],
         [ a dqv:QualityMeasurement ;
-            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/blank_nodes> ;
-            dqv:isMeasurementOf tags:M8 ;
-            dqv:value 0e+00 ],
-        [ a dqv:QualityMeasurement ;
-            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/blank_nodes> ;
+            dqv:computedOn <http://example.org/tags/dataset/blank_nodes> ;
             dqv:isMeasurementOf tags:M4 ;
             dqv:value 3 ],
         [ a dqv:QualityMeasurement ;
-            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/blank_nodes> ;
+            dqv:computedOn <http://example.org/tags/dataset/blank_nodes> ;
+            dqv:isMeasurementOf tags:M2 ;
+            dqv:value 3 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://example.org/tags/dataset/blank_nodes> ;
+            dqv:isMeasurementOf tags:M14 ;
+            dqv:value 1e+00 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://example.org/tags/dataset/blank_nodes> ;
+            dqv:isMeasurementOf tags:M8 ;
+            dqv:value 0e+00 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://example.org/tags/dataset/blank_nodes> ;
+            dqv:isMeasurementOf tags:M3 ;
+            dqv:value 2 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://example.org/tags/dataset/blank_nodes> ;
+            dqv:isMeasurementOf tags:M9 ;
+            dqv:value 0e+00 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://example.org/tags/dataset/blank_nodes> ;
+            dqv:isMeasurementOf tags:M6 ;
+            dqv:value 6.666667e-01 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://example.org/tags/dataset/blank_nodes> ;
+            dqv:isMeasurementOf tags:M16 ;
+            dqv:value 1.584963e+00 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://example.org/tags/dataset/blank_nodes> ;
+            dqv:isMeasurementOf tags:M13 ;
+            dqv:value 0 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://example.org/tags/dataset/blank_nodes> ;
             dqv:isMeasurementOf tags:M12 ;
-            dqv:value 0 ] ;
+            dqv:value 0 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://example.org/tags/dataset/blank_nodes> ;
+            dqv:isMeasurementOf tags:M1 ;
+            dqv:value 6 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://example.org/tags/dataset/blank_nodes> ;
+            dqv:isMeasurementOf tags:M5 ;
+            dqv:value 1.333333e+00 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://example.org/tags/dataset/blank_nodes> ;
+            dqv:isMeasurementOf tags:M11 ;
+            dqv:value 1 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://example.org/tags/dataset/blank_nodes> ;
+            dqv:isMeasurementOf tags:M10 ;
+            dqv:value 1.5e+00 ] ;
     tags:weakIslandThreshold 2 .
 
