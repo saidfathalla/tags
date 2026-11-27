@@ -172,3 +172,38 @@ def test_defect_injection(tmp_path):
     assert m(res, "M12") == 1 + 1 + 5         # O_1, Node_A (typed, now isolated), 5 typed orphans
     assert res["diagnostics"]["untyped_isolated_nodes"] == 5
     assert m(res, "M13") == 13                # O_1, {A}, {E,F}, 10 injected (tau = 2)
+
+
+# --------------------------------------------------------------------------
+# Synthetic generators and the Flat-NetworkX baseline
+sys.path.insert(0, os.path.join(ROOT, "benchmarks"))
+
+
+@pytest.mark.parametrize("topology", ["chain", "scale-free", "clustered"])
+def test_generators_write_exact_triple_count(tmp_path, topology):
+    import benchmark
+    f = tmp_path / f"{topology}.nt"
+    benchmark.GENERATORS[topology](2000, str(f))
+    assert sum(1 for _ in open(f)) == 2000
+    res = profile(str(f), file_format="nt")
+    assert m(res, "M1") == 2000
+    if topology == "clustered":
+        assert m(res, "M9") > 0.3                  # many triangles
+    if topology != "chain":
+        assert m(res, "M10") > 5 and m(res, "M11") == 1   # hubs, one component
+
+
+def test_construction_filter_baseline_loses_orphans():
+    import flat_networkx_baseline as fb
+    g_ref = os.path.join(ROOT, "tests", "test_baseline.ttl")
+    built = fb.networkx_variant(g_ref, None, 2, "construction")
+    assert built["M2"] == 6 and built["M12"] == 0     # O_1 never enters the graph
+    assert fb.networkx_variant(g_ref, None, 2, "posthoc")["M2"] == 10   # class nodes kept
+
+
+def test_custom_base_iri(tmp_path):
+    res = profile(os.path.join(ROOT, "tests", "test_baseline.ttl"))
+    path = tags.export_void_statistics(res, "g", str(tmp_path), base_iri="https://example.com/ds/")
+    g = rdflib.Graph().parse(path)
+    assert (rdflib.URIRef("https://example.com/ds/g"), rdflib.RDF.type,
+            rdflib.URIRef("http://rdfs.org/ns/void#Dataset")) in g

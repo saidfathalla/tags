@@ -38,6 +38,8 @@ DQV = Namespace("http://www.w3.org/ns/dqv#")
 # TAGS metric vocabulary (M1-M16). The IRI must resolve to tags_vocab.ttl once
 # published (e.g., via w3id.org or the project repository); replace if needed.
 TAGS = Namespace("https://w3id.org/tags/vocab#")
+# Namespace for the IRI of each profiled dataset (override with --base-iri).
+DEFAULT_BASE_IRI = "http://example.org/tags/dataset/"
 
 
 def analyze_knowledge_graph(ttl_file, file_format=None, tau=2, isolate_taxonomy=True):
@@ -302,7 +304,7 @@ def export_metric_vocabulary(results, output_dir):
     return path
 
 
-def export_void_statistics(results, base_name, output_dir):
+def export_void_statistics(results, base_name, output_dir, base_iri=None):
     """Generates a machine-readable W3C VoID profile.
 
     Dataset-level statistics with a VoID equivalent are written as VoID
@@ -317,7 +319,7 @@ def export_void_statistics(results, base_name, output_dir):
     void_g.bind("dqv", DQV)
     void_g.bind("tags", TAGS)
 
-    dataset_uri = URIRef(f"http://purls.helmholtz-metadaten.de/helmholtzkg/{base_name}")
+    dataset_uri = URIRef(f"{base_iri or DEFAULT_BASE_IRI}{base_name}")
     void_g.add((dataset_uri, RDF.type, VOID.Dataset))
     void_g.add((dataset_uri, DCTERMS.title, Literal(f"Topological Profile for {base_name}", lang="en")))
     void_g.add((dataset_uri, TAGS.weakIslandThreshold,
@@ -472,6 +474,8 @@ def main():
     parser.add_argument("-f", "--format", default=None, help="RDF serialization format specification (e.g., turtle, xml, json-ld, nt). Auto-guessed if omitted.")
     parser.add_argument("--tau", type=int, default=2, help="Node-count threshold for prunable weak islands (M13). Default: 2.")
     parser.add_argument("--flat", action="store_true", help="Ablation mode: keep rdf:type triples as edges (no taxonomic isolation).")
+    parser.add_argument("--base-iri", default=DEFAULT_BASE_IRI,
+                        help=f"Namespace for the dataset IRI in the VoID profile (default: {DEFAULT_BASE_IRI}).")
     args = parser.parse_args()
     
     if not os.path.exists(args.ttl_file):
@@ -500,7 +504,7 @@ def main():
 
     display_terminal_dashboard(results, source_name)
     
-    void_path = export_void_statistics(results, base_name, target_dir)
+    void_path = export_void_statistics(results, base_name, target_dir, base_iri=args.base_iri)
     vocab_path = export_metric_vocabulary(results, target_dir)
     print(f"[FAIR Data Success] Reusable W3C VoID/DQV profile exported to: {void_path}")
     print(f"[FAIR Data Success] TAGS metric vocabulary exported to: {vocab_path}")

@@ -5,8 +5,8 @@
 @prefix void: <http://rdfs.org/ns/void#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<http://purls.helmholtz-metadaten.de/helmholtzkg/self_loops> a void:Dataset ;
-    dcterms:modified "2026-11-11T12:55:23+00:00"^^xsd:dateTime ;
+<http://example.org/tags/dataset/self_loops> a void:Dataset ;
+    dcterms:modified "2026-11-27T10:27:56+00:00"^^xsd:dateTime ;
     dcterms:title "Topological Profile for self_loops"@en ;
     void:classPartition [ void:class schema:Process ;
             void:entities 2 ] ;
@@ -16,68 +16,68 @@
     void:properties 3 ;
     void:triples 4 ;
     dqv:hasQualityMeasurement [ a dqv:QualityMeasurement ;
-            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/self_loops> ;
-            dqv:isMeasurementOf tags:M15 ;
-            dqv:value 1e+00 ],
-        [ a dqv:QualityMeasurement ;
-            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/self_loops> ;
+            dqv:computedOn <http://example.org/tags/dataset/self_loops> ;
             dqv:isMeasurementOf tags:M3 ;
             dqv:value 1 ],
         [ a dqv:QualityMeasurement ;
-            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/self_loops> ;
-            dqv:isMeasurementOf tags:M13 ;
-            dqv:value 1 ],
-        [ a dqv:QualityMeasurement ;
-            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/self_loops> ;
-            dqv:isMeasurementOf tags:M4 ;
-            dqv:value 2 ],
-        [ a dqv:QualityMeasurement ;
-            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/self_loops> ;
-            dqv:isMeasurementOf tags:M7 ;
-            dqv:value 5e-01 ],
-        [ a dqv:QualityMeasurement ;
-            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/self_loops> ;
-            dqv:isMeasurementOf tags:M12 ;
-            dqv:value 0 ],
-        [ a dqv:QualityMeasurement ;
-            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/self_loops> ;
-            dqv:isMeasurementOf tags:M14 ;
-            dqv:value 1e+00 ],
-        [ a dqv:QualityMeasurement ;
-            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/self_loops> ;
-            dqv:isMeasurementOf tags:M8 ;
-            dqv:value 0e+00 ],
-        [ a dqv:QualityMeasurement ;
-            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/self_loops> ;
-            dqv:isMeasurementOf tags:M16 ;
-            dqv:value 0e+00 ],
-        [ a dqv:QualityMeasurement ;
-            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/self_loops> ;
+            dqv:computedOn <http://example.org/tags/dataset/self_loops> ;
             dqv:isMeasurementOf tags:M11 ;
             dqv:value 1 ],
         [ a dqv:QualityMeasurement ;
-            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/self_loops> ;
-            dqv:isMeasurementOf tags:M6 ;
-            dqv:value 1e+00 ],
+            dqv:computedOn <http://example.org/tags/dataset/self_loops> ;
+            dqv:isMeasurementOf tags:M7 ;
+            dqv:value 5e-01 ],
         [ a dqv:QualityMeasurement ;
-            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/self_loops> ;
+            dqv:computedOn <http://example.org/tags/dataset/self_loops> ;
             dqv:isMeasurementOf tags:M2 ;
             dqv:value 2 ],
         [ a dqv:QualityMeasurement ;
-            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/self_loops> ;
-            dqv:isMeasurementOf tags:M5 ;
+            dqv:computedOn <http://example.org/tags/dataset/self_loops> ;
+            dqv:isMeasurementOf tags:M13 ;
+            dqv:value 1 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://example.org/tags/dataset/self_loops> ;
+            dqv:isMeasurementOf tags:M10 ;
             dqv:value 1e+00 ],
         [ a dqv:QualityMeasurement ;
-            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/self_loops> ;
+            dqv:computedOn <http://example.org/tags/dataset/self_loops> ;
+            dqv:isMeasurementOf tags:M12 ;
+            dqv:value 0 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://example.org/tags/dataset/self_loops> ;
+            dqv:isMeasurementOf tags:M15 ;
+            dqv:value 1e+00 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://example.org/tags/dataset/self_loops> ;
+            dqv:isMeasurementOf tags:M4 ;
+            dqv:value 2 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://example.org/tags/dataset/self_loops> ;
             dqv:isMeasurementOf tags:M9 ;
             dqv:value 0e+00 ],
         [ a dqv:QualityMeasurement ;
-            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/self_loops> ;
+            dqv:computedOn <http://example.org/tags/dataset/self_loops> ;
             dqv:isMeasurementOf tags:M1 ;
             dqv:value 4 ],
         [ a dqv:QualityMeasurement ;
-            dqv:computedOn <http://purls.helmholtz-metadaten.de/helmholtzkg/self_loops> ;
-            dqv:isMeasurementOf tags:M10 ;
+            dqv:computedOn <http://example.org/tags/dataset/self_loops> ;
+            dqv:isMeasurementOf tags:M14 ;
+            dqv:value 1e+00 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://example.org/tags/dataset/self_loops> ;
+            dqv:isMeasurementOf tags:M16 ;
+            dqv:value 0e+00 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://example.org/tags/dataset/self_loops> ;
+            dqv:isMeasurementOf tags:M6 ;
+            dqv:value 1e+00 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://example.org/tags/dataset/self_loops> ;
+            dqv:isMeasurementOf tags:M8 ;
+            dqv:value 0e+00 ],
+        [ a dqv:QualityMeasurement ;
+            dqv:computedOn <http://example.org/tags/dataset/self_loops> ;
+            dqv:isMeasurementOf tags:M5 ;
             dqv:value 1e+00 ] ;
     tags:weakIslandThreshold 2 .
 

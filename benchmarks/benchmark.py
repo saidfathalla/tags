@@ -14,8 +14,12 @@ sample standard deviation (SD) and 95% confidence interval of the mean
 
 Usage
 -----
-  # Synthetic scalability benchmark (Tables 5 and 6, scalability figure)
+  # Synthetic scalability benchmark (chain-like graphs; Table 5, scalability figure)
   python benchmarks/benchmark.py synthetic --sizes 1000 10000 100000 1000000 --runs 5
+
+  # Same benchmark on scale-free (hub-dominated) and clustered (hubs + triangles) graphs
+  python benchmarks/benchmark.py synthetic --topology scale-free --runs 5
+  python benchmarks/benchmark.py synthetic --topology clustered --runs 5
 
   # Any RDF file (e.g., the DBpedia Berlin sample or the ORKG dump)
   python benchmarks/benchmark.py file examples/DBpedia-mini-samples-Berlin.ttl --runs 5
@@ -77,6 +81,98 @@ def generate_chain_graph(num_triples, path, seed=42, type_ratio=0.2, num_classes
             else:
                 f.write(f"<{ex}entity_{i}> <{ex}relatesTo> <{ex}entity_{i + 1}> .\n")
 
+
+def generate_scale_free_graph(num_triples, path, seed=42, type_ratio=0.2, num_classes=7, m=2):
+    """Scale-free synthetic RDF graph (Barabasi-Albert preferential attachment) in N-Triples.
+
+    Each new entity links to m existing entities chosen with probability proportional
+    to their degree, which produces a few high-degree hubs and many triangles near them;
+    with probability type_ratio the new entity also receives an rdf:type assertion.
+    The file contains exactly num_triples triples.
+    """
+    rng = random.Random(seed)
+    ex = "http://example.org/"
+    rdf_type = "<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>"
+    pool = []                      # node ids repeated once per incident edge
+    written = 0
+    with open(path, "w", encoding="utf-8") as f:
+        # seed clique of m + 1 entities
+        for i in range(m + 1):
+            for j in range(i):
+                if written >= num_triples:
+                    return
+                f.write(f"<{ex}entity_{i}> <{ex}relatesTo> <{ex}entity_{j}> .\n")
+                pool += [i, j]
+                written += 1
+        node = m + 1
+        while written < num_triples:
+            targets = set()
+            while len(targets) < m:
+                targets.add(rng.choice(pool))
+            for t in targets:
+                if written >= num_triples:
+                    break
+                f.write(f"<{ex}entity_{node}> <{ex}relatesTo> <{ex}entity_{t}> .\n")
+                pool += [node, t]
+                written += 1
+            if written < num_triples and rng.random() < type_ratio:
+                f.write(f"<{ex}entity_{node}> {rdf_type} <{ex}Class_{rng.randrange(num_classes)}> .\n")
+                written += 1
+            node += 1
+
+
+def generate_clustered_graph(num_triples, path, seed=42, type_ratio=0.2, num_classes=7, m=2, p_triad=0.8):
+    """Scale-free graph with high clustering (Holme-Kim model) in N-Triples.
+
+    Like generate_scale_free_graph, but after each preferential-attachment link the next
+    link of the new entity closes a triangle (links to a neighbour of the previous target)
+    with probability p_triad. This produces hubs and many triangles, the worst case for
+    the clustering-coefficient metrics (M8, M9). The file contains exactly num_triples triples.
+    """
+    rng = random.Random(seed)
+    ex = "http://example.org/"
+    rdf_type = "<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>"
+    pool, nbrs = [], {}
+    written = 0
+
+    def link(f, a, b):
+        f.write(f"<{ex}entity_{a}> <{ex}relatesTo> <{ex}entity_{b}> .\n")
+        pool.extend((a, b))
+        nbrs.setdefault(a, []).append(b)
+        nbrs.setdefault(b, []).append(a)
+
+    with open(path, "w", encoding="utf-8") as f:
+        for i in range(m + 1):
+            for j in range(i):
+                if written >= num_triples:
+                    return
+                link(f, i, j)
+                written += 1
+        node = m + 1
+        while written < num_triples:
+            chosen, last = set(), None
+            while len(chosen) < m and written < num_triples:
+                cand = None
+                if last is not None and rng.random() < p_triad:
+                    opts = [x for x in nbrs[last] if x not in chosen and x != node]
+                    if opts:
+                        cand = rng.choice(opts)
+                if cand is None:
+                    cand = rng.choice(pool)
+                    if cand in chosen:
+                        continue
+                chosen.add(cand)
+                link(f, node, cand)
+                written += 1
+                last = cand
+            if written < num_triples and rng.random() < type_ratio:
+                f.write(f"<{ex}entity_{node}> {rdf_type} <{ex}Class_{rng.randrange(num_classes)}> .\n")
+                written += 1
+            node += 1
+
+
+GENERATORS = {"chain": generate_chain_graph, "scale-free": generate_scale_free_graph,
+              "clustered": generate_clustered_graph}
 
 # ------------------------------------------------------------ measurement
 def _worker(path, fmt, tau, queue):
@@ -144,14 +240,15 @@ def write_csv(path, rows, fields):
 # ------------------------------------------------------------- commands
 def cmd_synthetic(args):
     os.makedirs(args.out, exist_ok=True)
+    prefix = "synthetic" if args.topology == "chain" else f"synthetic_{args.topology}"
     data_dir = os.path.join(args.out, "synthetic_data")
     os.makedirs(data_dir, exist_ok=True)
     per_run, summary = [], []
     for n in args.sizes:
-        path = os.path.join(data_dir, f"chain_{n}.nt")
+        path = os.path.join(data_dir, f"{args.topology}_{n}.nt")
         if not os.path.exists(path):
-            generate_chain_graph(n, path, seed=args.seed)
-        print(f"[{n:,} triples]")
+            GENERATORS[args.topology](n, path, seed=args.seed)
+        print(f"[{args.topology}, {n:,} triples]")
         rows = measure(path, "nt", args.tau, args.runs)
         for r in rows:
             per_run.append({"triples": n, **r})
@@ -163,9 +260,9 @@ def cmd_synthetic(args):
         if not args.keep_data:
             os.remove(path)
 
-    write_csv(os.path.join(args.out, "synthetic_runs.csv"), per_run,
+    write_csv(os.path.join(args.out, f"{prefix}_runs.csv"), per_run,
               ["triples", "run", "time_s", "peak_rss_delta_mb", "M1"])
-    write_csv(os.path.join(args.out, "synthetic_summary.csv"), summary, list(summary[0].keys()))
+    write_csv(os.path.join(args.out, f"{prefix}_summary.csv"), summary, list(summary[0].keys()))
 
     # Linear fit (time and memory vs. triples) and extrapolation (Table 6)
     xs = [s["triples"] for s in summary]
@@ -174,7 +271,7 @@ def cmd_synthetic(args):
     extra = [{"triples": n, "projected_time_s": fit_t[0] * n + fit_t[1],
               "projected_peak_rss_delta_mb": fit_m[0] * n + fit_m[1]} for n in args.extrapolate]
     if extra:
-        write_csv(os.path.join(args.out, "synthetic_extrapolation.csv"), extra, list(extra[0].keys()))
+        write_csv(os.path.join(args.out, f"{prefix}_extrapolation.csv"), extra, list(extra[0].keys()))
     loglog = linfit([math.log10(x) for x in xs], [math.log10(s["time_mean_s"]) for s in summary])
 
     print("\nEnvironment:", environment())
@@ -190,7 +287,7 @@ def cmd_synthetic(args):
         print(f"{'triples':>12} {'projected time (s)':>19} {'projected peak RSS delta (MB)':>30}")
         for e in extra:
             print(f"{e['triples']:>12,} {e['projected_time_s']:>19.3f} {e['projected_peak_rss_delta_mb']:>30.2f}")
-    plot(summary, loglog, os.path.join(args.out, "tags_scalability.png"))
+    plot(summary, loglog, os.path.join(args.out, "tags_scalability.png" if args.topology == "chain" else f"tags_scalability_{args.topology}.png"))
 
 
 def cmd_file(args):
@@ -248,10 +345,13 @@ def plot(summary, loglog, path):
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
-    s = sub.add_parser("synthetic", help="scalability benchmark on generated chain-like graphs")
+    s = sub.add_parser("synthetic", help="scalability benchmark on generated graphs (chain, scale-free, or clustered)")
     s.add_argument("--sizes", type=int, nargs="+", default=[1000, 10000, 100000, 1000000])
     s.add_argument("--extrapolate", type=int, nargs="*", default=[5000000, 10000000, 50000000])
     s.add_argument("--seed", type=int, default=42)
+    s.add_argument("--topology", choices=sorted(GENERATORS), default="chain",
+                   help="chain: low-clustering chains (default); scale-free: Barabasi-Albert hubs; "
+                        "clustered: hubs plus many triangles (Holme-Kim)")
     s.add_argument("--keep-data", action="store_true", help="keep generated N-Triples files")
     f = sub.add_parser("file", help="benchmark TAGS on an existing RDF file")
     f.add_argument("path")
